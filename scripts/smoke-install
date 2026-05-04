@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$repo_root"
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || {
+    printf 'missing required command: %s\n' "$1" >&2
+    exit 1
+  }
+}
+
+need claude
+need codex
+
+release_root="$(mktemp -d /tmp/clayers-release-smoke.XXXXXX)"
+claude_home="$(mktemp -d /tmp/clayers-claude-home.XXXXXX)"
+claude_project="$(mktemp -d /tmp/clayers-claude-project.XXXXXX)"
+codex_home="$(mktemp -d /tmp/clayers-codex-home.XXXXXX)"
+
+mkdir -p "$release_root/.agents/plugins" "$release_root/.claude-plugin" "$release_root/plugins"
+cp -R claude-plugin "$release_root/claude-plugin"
+cp -R plugins/clayers "$release_root/plugins/clayers"
+cp .claude-plugin/marketplace.json "$release_root/.claude-plugin/marketplace.json"
+cp codex-marketplace.json "$release_root/codex-marketplace.json"
+cp codex-marketplace.json "$release_root/.agents/plugins/marketplace.json"
+
+printf 'release mirror: %s\n' "$release_root"
+
+(
+  cd "$claude_project"
+  HOME="$claude_home" claude plugin marketplace add "$release_root"
+  HOME="$claude_home" claude plugin install clayers@clayers-plugins --scope local
+  HOME="$claude_home" claude plugin list | tee "$release_root/claude-plugin-list.txt"
+)
+rg -q "clayers@clayers-plugins" "$release_root/claude-plugin-list.txt"
+printf 'OK   Claude marketplace install smoke test\n'
+
+HOME="$codex_home" codex plugin marketplace add "$release_root"
+rg -q "marketplaces.clayers-local" "$codex_home/.codex/config.toml"
+printf 'OK   Codex marketplace add smoke test\n'
+
+printf 'smoke state kept at: %s %s %s %s\n' "$release_root" "$claude_home" "$claude_project" "$codex_home"

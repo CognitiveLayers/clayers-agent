@@ -1,0 +1,36 @@
+{
+  "name": "clayers-orchestrator",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-04",
+  "observability": {
+    "enabled": true
+  },
+  "containers": [
+    {
+      "class_name": "ClayersRunnerContainer",
+      "image": "../Dockerfile",
+      "image_build_context": "..",
+      "max_instances": 5,
+      "instance_type": "basic",
+      "image_vars": {
+        "HOST": "0.0.0.0",
+        "PORT": "8787",
+        "CLAYERS_ORCHESTRATOR_ALLOW_LOCAL_PATHS": "0"
+      }
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CLAYERS_RUNNER",
+        "class_name": "ClayersRunnerContainer"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ClayersRunnerContainer"]
+    }
+  ]
+}

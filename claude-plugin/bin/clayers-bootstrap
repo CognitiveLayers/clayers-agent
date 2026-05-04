@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+install=0
+force=0
+print_bin=0
+print_bin_dir=0
+check_only=0
+
+usage() {
+  cat <<'USAGE'
+Usage: clayers-bootstrap [--install] [--force] [--check] [--print-bin] [--bin-dir]
+
+Finds or installs the core clayers CLI for the Claude Code plugin.
+
+Resolution order:
+  1. CLAYERS_BIN, if set
+  2. Plugin-managed install
+  3. clayers on PATH
+
+With --install, installs the pinned Clayers version into:
+  ${CLAYERS_PLUGIN_HOME:-$XDG_DATA_HOME/clayers-plugin}/clayers-<version>
+
+Environment:
+  CLAYERS_BIN             Explicit clayers binary path
+  CLAYERS_PLUGIN_HOME     Override plugin-managed tool directory
+  CLAYERS_INSTALL_METHOD  cargo, python, or auto (default)
+USAGE
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --install)
+      install=1
+      shift
+      ;;
+    --force)
+      force=1
+      shift
+      ;;
+    --check)
+      check_only=1
+      shift
+      ;;
+    --print-bin)
+      print_bin=1
+      shift
+      ;;
+    --bin-dir)
+      print_bin_dir=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'error: unexpected argument: %s\n' "$1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+plugin_root="$(CDPATH= cd -- "$script_dir/.." && pwd)"
+version_file="$plugin_root/CLAYERS_VERSION"
+
+if [ -f "$version_file" ]; then
+  wanted_version="$(tr -d '[:space:]' < "$version_file")"
+else
+  wanted_version="0.2.1"
+fi
+
+home_dir="${HOME:-/tmp}"
+data_home="${XDG_DATA_HOME:-$home_dir/.local/share}"
+plugin_home="${CLAYERS_PLUGIN_HOME:-$data_home/clayers-plugin}"
+install_root="$plugin_home/clayers-$wanted_version"
+bin_dir="$install_root/bin"
+managed_bin="$bin_dir/clayers"
+
+log() {
+  printf '%s\n' "$*" >&2
+}
+
+clayers_version() {
+  {
+    "$1" --version 2>/dev/null || "$1" -V 2>/dev/null || true
+  } | awk 'NR == 1 {print $2}'
+}
+
+clayers_usable() {
+  "$1" validate --help >/dev/null 2>&1 &&
+    "$1" adopt --help >/dev/null 2>&1 &&
+    "$1" artifact --help >/dev/null 2>&1 &&
+    "$1" connectivity --help >/dev/null 2>&1 &&
+    "$1" doc --help >/dev/null 2>&1
+}
+
+describe_bin() {
+  found="$(clayers_version "$1" || true)"
+  if [ -n "$found" ]; then
+    printf '%s\n' "$found"
+  else
+    printf 'unknown version\n'
+  fi
+}
+
+version_ok() {
+  bin="$1"
+  found="$(clayers_version "$bin" || true)"
+  if [ -z "$found" ]; then
+    clayers_usable "$bin"
+    return $?
+  fi
+  case "$found" in
+    "$wanted_version"|"$wanted_version"-*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+emit_bin() {
+  bin="$1"
+  if [ "$print_bin_dir" -eq 1 ]; then
+    dirname "$bin"
+  fi
+  if [ "$print_bin" -eq 1 ]; then
+    printf '%s\n' "$bin"
+  fi
+}
+
+find_existing() {
+  if [ -n "${CLAYERS_BIN:-}" ] && [ -x "$CLAYERS_BIN" ] && version_ok "$CLAYERS_BIN"; then
+    printf '%s\n' "$CLAYERS_BIN"
+    return 0
+  fi
+
+  if [ "$force" -eq 0 ] && [ -x "$managed_bin" ] && version_ok "$managed_bin"; then
+    printf '%s\n' "$managed_bin"
+    return 0
+  fi
+
+  if [ "$force" -eq 0 ] && command -v clayers >/dev/null 2>&1; then
+    path_bin="$(command -v clayers)"
+    if version_ok "$path_bin"; then
+      printf '%s\n' "$path_bin"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+install_with_cargo() {
+  command -v cargo >/dev/null 2>&1 || return 1
+  log "Installing clayers $wanted_version with Cargo into $install_root"
+  mkdir -p "$install_root"
+  cargo_args=(install clayers --version "$wanted_version" --locked --root "$install_root")
+  if [ "$force" -eq 1 ]; then
+    cargo_args+=(--force)
+  fi
+  CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$install_root/target}" \
+    cargo "${cargo_args[@]}"
+}
+
+install_with_python() {
+  py=""
+  if command -v python3 >/dev/null 2>&1; then
+    py="$(command -v python3)"
+  elif command -v python >/dev/null 2>&1; then
+    py="$(command -v python)"
+  else
+    return 1
+  fi
+
+  venv_dir="$install_root/venv"
+  log "Installing clayers $wanted_version with Python venv into $venv_dir"
+  mkdir -p "$install_root" "$bin_dir"
+  "$py" -m venv "$venv_dir"
+  "$venv_dir/bin/python" -m pip install --upgrade pip
+  "$venv_dir/bin/python" -m pip install "clayers==$wanted_version"
+
+  if [ ! -x "$venv_dir/bin/clayers" ]; then
+    log "Python package installed, but venv clayers executable was not found"
+    return 1
+  fi
+
+  cat > "$managed_bin" <<EOF
+#!/usr/bin/env bash
+exec "$venv_dir/bin/clayers" "\$@"
+EOF
+  chmod +x "$managed_bin"
+}
+
+install_managed() {
+  rm -rf "$install_root.tmp"
+  mkdir -p "$plugin_home"
+
+  method="${CLAYERS_INSTALL_METHOD:-auto}"
+  case "$method" in
+    cargo)
+      install_with_cargo
+      ;;
+    python)
+      install_with_python
+      ;;
+    auto)
+      install_with_cargo || install_with_python
+      ;;
+    *)
+      log "unknown CLAYERS_INSTALL_METHOD: $method"
+      return 2
+      ;;
+  esac
+
+  if [ ! -x "$managed_bin" ]; then
+    log "install completed, but $managed_bin is missing"
+    return 1
+  fi
+
+  if ! version_ok "$managed_bin"; then
+    found="$(clayers_version "$managed_bin" || true)"
+    log "installed clayers version '$found' does not satisfy $wanted_version"
+    return 1
+  fi
+}
+
+if existing="$(find_existing)"; then
+  if [ "$check_only" -eq 1 ] && [ "$print_bin" -eq 0 ] && [ "$print_bin_dir" -eq 0 ]; then
+    log "clayers available: $existing ($(describe_bin "$existing"))"
+  fi
+  emit_bin "$existing"
+  exit 0
+fi
+
+if [ "$check_only" -eq 1 ] && [ "$install" -eq 0 ]; then
+  log "clayers $wanted_version is not available"
+  exit 1
+fi
+
+if [ "$install" -eq 0 ]; then
+  log "clayers $wanted_version is not available; run: clayers-bootstrap --install"
+  exit 1
+fi
+
+install_managed
+emit_bin "$managed_bin"
+
+if [ "$print_bin" -eq 0 ] && [ "$print_bin_dir" -eq 0 ]; then
+  log "clayers ready: $managed_bin ($(describe_bin "$managed_bin"))"
+fi

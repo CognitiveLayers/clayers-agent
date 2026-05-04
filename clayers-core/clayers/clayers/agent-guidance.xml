@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Agent Guidance: Workflow instructions, onboarding skill, and artifact
+  review skill. Content is stored as text in llm:node elements using
+  CDATA sections, extracted at adopt time by the CLI.
+-->
+<spec:clayers xmlns:spec="urn:clayers:spec"
+       xmlns:pr="urn:clayers:prose"
+       xmlns:org="urn:clayers:organization"
+       xmlns:rel="urn:clayers:relation"
+       xmlns:art="urn:clayers:artifact"
+       xmlns:llm="urn:clayers:llm"
+       spec:index="index.xml">
+
+  <!-- Content descriptions -->
+
+  <pr:section id="agent-workflow-instructions">
+    <pr:title>Agent workflow instructions</pr:title>
+    <pr:shortdesc>The spec-first development workflow injected into
+    CLAUDE.md or AGENTS.md during adoption.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the markdown text that gets
+    wrapped in HTML comment markers and appended to the project's agent
+    file. It describes the six-step spec-first workflow and references
+    to clayers commands for validation, coverage, connectivity, and
+    drift.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-onboard">
+    <pr:title>Onboard skill</pr:title>
+    <pr:shortdesc>Comprehensive codebase onboarding skill for Claude Code,
+    with catch-up mode for filling gaps in existing specs.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-onboard skill. The skill is a generic orchestrator that
+    discovers lyr:mode[@name="onboard"] elements from the project spec,
+    resolves dependencies via lyr:requires, and executes each mode's
+    guidance body in topological order.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-review-artifacts">
+    <pr:title>Review artifacts skill</pr:title>
+    <pr:shortdesc>Artifact review and coverage improvement skill for
+    Claude Code with drift root-cause analysis.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-review-artifacts skill. The skill is a generic orchestrator
+    that queries lyr:mode[@name="review"] and lyr:mode[@name="catch-up"]
+    elements from the project spec and executes their guidance bodies to
+    improve coverage, connectivity, and resolve drift.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-brainstorm">
+    <pr:title>Brainstorm skill</pr:title>
+    <pr:shortdesc>Structured design brainstorming skill for Claude Code,
+    producing clayers XML spec files instead of markdown design docs.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-brainstorm skill. The skill is a generic orchestrator that
+    queries lyr:mode[@name="brainstorm"] elements from the project spec,
+    follows lyr:requires dependencies, and executes each layer's
+    brainstorm guidance body to produce spec XML.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-write-plan">
+    <pr:title>Write plan skill</pr:title>
+    <pr:shortdesc>Implementation plan writing skill for Claude Code,
+    producing pln:plan XML in the clayers spec.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-write-plan skill. The skill is a generic orchestrator that
+    reads existing spec nodes, queries the plan layer's
+    lyr:mode[@name="brainstorm"] for plan-creation guidance, and follows
+    its body to produce structured pln:plan XML.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-execute-plan">
+    <pr:title>Execute plan skill</pr:title>
+    <pr:shortdesc>Plan execution skill for Claude Code, implementing
+    plan items with artifact mapping and status tracking.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-execute-plan skill. The skill is a generic orchestrator that
+    reads pln:plan items from the spec, queries the artifact layer's
+    lyr:mode[@name="onboard"] for mapping guidance, and executes each
+    item with TDD, artifact mapping, and status tracking.</pr:p>
+  </pr:section>
+
+  <pr:section id="neighbors-command">
+    <pr:title>Neighbors CLI command</pr:title>
+    <pr:shortdesc>`clayers neighbors ID PATH --json` — one-shot
+    neighbor collector across three edge kinds (explicit relations,
+    terminology references, artifact mappings) with a hub pre-filter
+    and cached peeks. Phase-3 helper for the clayers-context skill.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the operational description
+    of the subcommand. The command walks the assembled combined
+    document once, collects relations (rel:relation[@from|@to=ID]),
+    terminology refs (inbound via ancestor-with-@id, outbound via
+    descendant trm:ref), and artifact mappings
+    (art:mapping[art:spec-ref/@node=ID]), dedupes by neighbor id
+    keeping the highest-priority edge, applies a K=12 hub pre-filter
+    with per-bucket top-2 diversity when triggered, and fetches peeks
+    from llm:node (preferred) or pr:shortdesc / trm:definition /
+    art:note (fallbacks). Returns one JSON bundle per landing so
+    skills replace 6+N separate `clayers query` calls with a single
+    invocation.</pr:p>
+  </pr:section>
+
+  <pr:section id="skill-clayers-context">
+    <pr:title>Context skill</pr:title>
+    <pr:shortdesc>Query-driven context retrieval skill for Claude Code:
+    finds relevant spec nodes via semantic search, filters with an LLM
+    judge, and traverses three edge kinds (relations, terminology refs,
+    artifact mappings) to assemble a focused brief without flooding the
+    main agent's context with raw XML.</pr:shortdesc>
+    <pr:p>This section's llm:node contains the SKILL.md content for the
+    clayers-context skill. Unlike the other clayers skills, which
+    orchestrate layer modes, this one dispatches subagents at every
+    phase that risks bulk content: Phase 2 precision-filtering, Phase 3
+    neighborhood traversal, and neighbor peeks. The main agent's
+    context only receives small structured verdicts until the final
+    markdown brief is assembled.</pr:p>
+  </pr:section>
+
+  <!-- Topic typing -->
+
+  <org:reference ref="agent-workflow-instructions">
+    <org:purpose>Reference text for the development workflow injected
+    into agent files during adoption.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-onboard">
+    <org:purpose>Reference content for the onboarding skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-review-artifacts">
+    <org:purpose>Reference content for the artifact review skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-brainstorm">
+    <org:purpose>Reference content for the brainstorm skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-write-plan">
+    <org:purpose>Reference content for the write-plan skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-execute-plan">
+    <org:purpose>Reference content for the execute-plan skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="skill-clayers-context">
+    <org:purpose>Reference content for the context skill template
+    generated by adopt --skills.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="neighbors-command">
+    <org:purpose>Reference material for the `clayers neighbors` CLI
+    subcommand, used by the context skill's Phase 3.</org:purpose>
+  </org:reference>
+
+  <!-- Relations -->
+
+  <rel:relation type="depends-on" from="skill-clayers-onboard" to="agent-workflow-instructions">
+    <rel:note>The onboarding skill builds on the workflow instructions,
+    providing detailed phase-by-phase guidance for the same process.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-review-artifacts" to="skill-clayers-onboard">
+    <rel:note>The review skill assumes onboarding has been done and
+    focuses on maintaining coverage as code evolves.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-brainstorm" to="agent-workflow-instructions">
+    <rel:note>The brainstorm skill builds on the spec-first workflow,
+    producing spec XML as its primary output.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-write-plan" to="skill-clayers-brainstorm">
+    <rel:note>The write-plan skill reads spec nodes created by
+    brainstorming to derive implementation plans.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-execute-plan" to="skill-clayers-write-plan">
+    <rel:note>The execute-plan skill reads plan items created by
+    write-plan and implements them sequentially.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-execute-plan" to="skill-clayers-review-artifacts">
+    <rel:note>Execute-plan uses artifact mapping patterns from the
+    review-artifacts skill during implementation.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-context" to="xpath-query-tooling">
+    <rel:note>The context skill uses clayers query throughout Phases
+    3 and 4 to traverse edges and fetch node bodies.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-context" to="search-overview">
+    <rel:note>Phase 1 of the context skill relies on clayers search
+    for semantic landing-point discovery; without it, vocabulary
+    mismatch between the user's query and the spec's idiom would
+    tank recall.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="skill-clayers-context" to="reading-maps-concept">
+    <rel:note>Reading maps are human-authored linear sequences;
+    the context skill produces query-driven, on-demand briefs.
+    Complementary navigation modes on the same spec graph.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="skill-clayers-context" to="neighbors-command">
+    <rel:note>Phase 3 of the context skill invokes `clayers neighbors`
+    once per kept landing to collect edges + peeks in a single pass,
+    replacing the older 6+N-query fan-out.</rel:note>
+  </rel:relation>
+
+  <!-- Extractable content (CDATA preserves markdown formatting) -->
+
+  <llm:node ref="agent-workflow-instructions" format="markdown"><![CDATA[
+## Clayers Development Workflow
+
+This project uses [clayers](https://github.com/CognitiveLayers/clayers) for
+structured, layered specifications with machine-verifiable traceability.
+
+**Spec first, code second.** Before implementing, update the spec to
+describe what you are building.
+
+1. **Update the spec** in `clayers/` — add prose, terminology, relations
+2. **Validate**: `clayers validate clayers/PROJECT/`
+3. **Implement** the code
+4. **Map spec to code** with artifact mappings, fix hashes
+5. **Iterate on quality**:
+   - Coverage: `clayers artifact --coverage clayers/PROJECT/`
+   - Connectivity: `clayers connectivity clayers/PROJECT/`
+   - Drift: `clayers artifact --drift clayers/PROJECT/`
+6. **Commit** spec + code together
+
+**Plans go in the spec.** Use the `pln:plan` layer to write implementation
+plans and save them in the knowledge base (`clayers/`). Plans are versioned,
+queryable, and linked to the concepts they implement.
+
+**Looking for what to do?** Drive spec coverage to 100%. Map every spec
+node to implementing code. This naturally leads to implementing everything
+that was specified.
+
+Install: `cargo install clayers`
+
+See [clayers documentation](https://github.com/CognitiveLayers/clayers) for
+the full layer reference (prose, terminology, organization, relation,
+decision, source, plan, artifact, llm, revision).
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-onboard" format="markdown"><![CDATA[
+---
+name: clayers-onboard
+description: >
+  Systematically onboard this project to clayers specifications. Discovers
+  layers and their onboarding modes from the spec, executes them in
+  dependency order, and iterates until all quality metrics are clean.
+  Use when: "onboard to clayers", "create specs", "drive coverage to 100%",
+  "catch up", "fill spec gaps".
+argument-hint: "[--resume | --catch-up]"
+allowed-tools:
+  - Bash(clayers validate *)
+  - Bash(clayers artifact *)
+  - Bash(clayers connectivity *)
+  - Bash(clayers query *)
+  - Bash(clayers schema *)
+---
+
+# Clayers Onboard
+
+Systematically create a complete clayers specification for **{{PROJECT_NAME}}**.
+
+The goal: every meaningful code construct is described in the spec, mapped
+via artifact traceability, and verified clean by the tooling.
+
+## Prerequisites
+
+1. **clayers is installed**: run `clayers --version`
+2. **Project is adopted**: `.clayers/schemas/` exists and
+   `clayers/{{PROJECT_NAME}}/index.xml` exists. If not, run `clayers adopt .`
+
+## Mode Selection
+
+- **Fresh onboarding** (default): start from the discovery phase
+- **Resume** (`--resume`): check which acceptance criteria already pass
+  and continue from the first incomplete mode
+- **Catch-up** (`--catch-up`): query `lyr:mode[@name="catch-up"]` instead
+  of onboard modes to fill gaps in an existing spec
+
+## Phase 1: Codebase Discovery
+
+Before executing layer modes, build a mental model:
+
+1. **Scan the project tree**: identify source directories, languages, build system
+2. **Catalog modules**: for each directory/package, note its purpose
+3. **Extract domain concepts**: identify domain terms from type names,
+   function names, constants, comments (feeds into terminology layer)
+4. **Map dependencies**: what depends on what (feeds into relation layer)
+
+This mental model guides the layer mode execution that follows.
+
+## Phase 2: Layer Mode Discovery
+
+Query the project spec for layers with onboard modes:
+
+```bash
+clayers query '//lyr:layer' clayers/{{PROJECT_NAME}}/
+clayers query '//lyr:mode[@name="onboard"]' clayers/{{PROJECT_NAME}}/
+```
+
+Each `lyr:layer` describes a layer. Each `lyr:mode[@name="onboard"]` inside
+declares how to onboard that layer, including:
+- `lyr:requires`: prerequisite layers
+- `lyr:condition`: when this mode applies
+- `lyr:acceptance`: success criteria
+- `pr:section` body: step-by-step guidance
+
+## Phase 3: Topological Execution
+
+Build a dependency graph from `lyr:requires` elements and execute modes
+in topological order:
+
+1. **For each mode in order**:
+   - Check `lyr:condition` against the project state. Skip if it doesn't apply.
+   - Read the mode body (the `pr:section` inside contains the guidance).
+   - Follow any `pr:xref ref="tpl-*"` links to templates in `templates.xml`
+     for XML boilerplate.
+   - Execute the guidance: create spec elements as instructed.
+   - Validate: `clayers validate clayers/{{PROJECT_NAME}}/`
+   - Check `lyr:acceptance` criteria.
+2. **If acceptance criteria fail**: re-read the mode guidance and fix gaps
+   before moving on.
+
+## Phase 4: Quality Iteration
+
+After all modes execute, run the full quality suite:
+
+```bash
+clayers artifact --coverage clayers/{{PROJECT_NAME}}/
+clayers connectivity clayers/{{PROJECT_NAME}}/
+clayers artifact --drift clayers/{{PROJECT_NAME}}/
+clayers validate clayers/{{PROJECT_NAME}}/
+```
+
+Targets:
+- **Coverage**: zero unmapped nodes
+- **Connectivity**: zero isolated nodes
+- **Drift**: zero drifted mappings
+- **Validation**: no structural errors
+
+For any metric that fails, re-execute the relevant layer's catch-up or
+review mode. Iterate until all metrics are clean.
+
+## Reading Mode Guidance
+
+To read a specific mode's guidance:
+
+```bash
+clayers query '//lyr:mode[@id="mode-trm-onboard"]' clayers/{{PROJECT_NAME}}/
+```
+
+The mode body contains a `pr:section` with detailed step-by-step guidance,
+template references, and anti-patterns. Follow it precisely.
+
+## Catch-Up Mode
+
+When invoked with `--catch-up`, query for catch-up modes instead:
+
+```bash
+clayers query '//lyr:mode[@name="catch-up"]' clayers/{{PROJECT_NAME}}/
+```
+
+Execute the same phases 2-4, using catch-up modes instead of onboard modes.
+Catch-up modes typically focus on gap analysis and targeted fixes rather
+than full layer construction.
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-review-artifacts" format="markdown"><![CDATA[
+---
+name: clayers-review-artifacts
+description: >
+  Review and improve artifact mappings, relations, and coverage.
+  Discovers review and catch-up modes from the spec, executes them
+  to improve quality metrics. Use when: "review artifacts", "fix drift",
+  "improve coverage", "check connectivity".
+allowed-tools:
+  - Bash(clayers validate *)
+  - Bash(clayers artifact *)
+  - Bash(clayers connectivity *)
+  - Bash(clayers query *)
+---
+
+# Clayers Review Artifacts
+
+Review and improve the quality of **{{PROJECT_NAME}}**'s specification.
+
+## Establish Baseline
+
+Before starting, record current metrics:
+
+```bash
+clayers artifact --coverage clayers/{{PROJECT_NAME}}/
+clayers artifact --drift clayers/{{PROJECT_NAME}}/
+clayers connectivity clayers/{{PROJECT_NAME}}/
+clayers validate clayers/{{PROJECT_NAME}}/
+```
+
+Record: total nodes, mapped, exempt, unmapped, drifted, isolated.
+
+## Discover Review and Catch-Up Modes
+
+Query the spec for layers with review modes:
+
+```bash
+clayers query '//lyr:mode[@name="review"]' clayers/{{PROJECT_NAME}}/
+```
+
+And for catch-up modes (needed if drift was detected):
+
+```bash
+clayers query '//lyr:mode[@name="catch-up"]' clayers/{{PROJECT_NAME}}/
+```
+
+## Execute Catch-Up Modes First
+
+If the baseline detected drift, execute catch-up modes for the relevant
+layers. Each catch-up mode body contains detailed guidance for handling
+its specific drift type (ARTIFACT DRIFTED, SPEC DRIFTED, UNAVAILABLE).
+
+For each drifted layer:
+1. Read the catch-up mode guidance (the `pr:section` body)
+2. Follow the drift-resolution steps
+3. Run `clayers artifact --fix-node-hash` and `--fix-artifact-hash` as directed
+4. Verify: `clayers artifact --drift clayers/{{PROJECT_NAME}}/`
+
+## Execute Review Modes
+
+For each layer with a review mode:
+1. Read the mode body (`pr:section` with detailed guidance)
+2. Follow the review steps (coverage checks, quality audits, etc.)
+3. Verify `lyr:acceptance` criteria are met
+
+The artifact layer's review mode covers: spec-to-code coverage, code-to-spec
+coverage, exemption audit, and mapping quality. The relation layer's review
+mode covers connectivity.
+
+## Final Verification
+
+Re-run all quality checks and report improvement:
+
+```bash
+clayers artifact --coverage clayers/{{PROJECT_NAME}}/
+clayers artifact --drift clayers/{{PROJECT_NAME}}/
+clayers connectivity clayers/{{PROJECT_NAME}}/
+clayers validate clayers/{{PROJECT_NAME}}/
+```
+
+Report deltas:
+- Coverage: unmapped before vs. after
+- Drift: drifted before vs. after
+- Connectivity: isolated before vs. after
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-brainstorm" format="markdown"><![CDATA[
+---
+name: clayers-brainstorm
+description: >
+  Design features as structured clayers XML specs. Discovers brainstorm
+  modes from the spec and engages relevant layers to produce prose,
+  terminology, relations, and LLM descriptions before code exists.
+  Use when: "design feature", "brainstorm", "create spec for".
+allowed-tools:
+  - Bash(clayers validate *)
+  - Bash(clayers query *)
+---
+
+# Clayers Brainstorm
+
+Design a feature for **{{PROJECT_NAME}}** as a structured specification
+before writing code.
+
+## Process
+
+1. **Understand the feature**: ask clarifying questions about purpose,
+   constraints, and success criteria before touching the spec
+2. **Discover brainstorm modes**: query the spec for layers with brainstorm
+   modes
+3. **Select relevant layers**: not all layers apply to every feature.
+   Check each brainstorm mode's `lyr:condition` against the feature
+4. **Execute modes in dependency order**: follow `lyr:requires`
+5. **For each mode**: read guidance, create spec elements, validate
+
+## Discover Brainstorm Modes
+
+```bash
+clayers query '//lyr:mode[@name="brainstorm"]' clayers/{{PROJECT_NAME}}/
+```
+
+Typical layers with brainstorm modes:
+- Prose: write sections describing the feature
+- Terminology: define new domain terms
+- Relation: link to existing spec nodes
+- Decision: record design choices
+- Plan: create implementation plan (after design is stable)
+
+## Execute
+
+For each applicable brainstorm mode:
+1. Read the mode body (`pr:section` with step-by-step guidance)
+2. Follow any `pr:xref` references to templates in `templates.xml`
+3. Create spec elements following the guidance
+4. Validate: `clayers validate clayers/{{PROJECT_NAME}}/`
+5. Check `lyr:acceptance` criteria
+
+## Validate
+
+After each layer mode:
+
+```bash
+clayers validate clayers/{{PROJECT_NAME}}/
+```
+
+Before declaring the brainstorm done, run the full quality suite:
+
+```bash
+clayers artifact --coverage clayers/{{PROJECT_NAME}}/
+clayers connectivity clayers/{{PROJECT_NAME}}/
+```
+
+The feature design is complete when:
+- All relevant layer brainstorm modes have their acceptance criteria met
+- New spec nodes are connected to existing ones via relations
+- The spec validates cleanly
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-write-plan" format="markdown"><![CDATA[
+---
+name: clayers-write-plan
+description: >
+  Create implementation plans as pln:plan XML in the spec. Reads existing
+  spec nodes and produces itemized steps with acceptance criteria.
+  Use when: "write plan", "create implementation plan", "plan feature".
+allowed-tools:
+  - Bash(clayers validate *)
+  - Bash(clayers query *)
+---
+
+# Clayers Write Plan
+
+Create an implementation plan for **{{PROJECT_NAME}}** that lives inside
+the spec as structured XML.
+
+## Read Existing Spec
+
+Query for nodes that need implementation:
+
+```bash
+clayers query '//pr:section/pr:title' clayers/{{PROJECT_NAME}}/ --text
+clayers query '//trm:term/trm:name' clayers/{{PROJECT_NAME}}/ --text
+clayers query '//dec:decision' clayers/{{PROJECT_NAME}}/
+```
+
+Understand what concepts exist, which have implementations (artifact
+mappings), and which are pending design decisions.
+
+## Read Plan Layer Guidance
+
+```bash
+clayers query '//lyr:mode[@id="mode-pln-brainstorm"]' clayers/{{PROJECT_NAME}}/
+```
+
+The plan layer's brainstorm mode contains detailed guidance for plan
+structure, item decomposition, and acceptance criteria.
+
+## Create Plan
+
+Follow the plan layer mode guidance. Use the template referenced there:
+
+```bash
+clayers query '//cnt:content[@id="tpl-plan"]' clayers/{{PROJECT_NAME}}/
+```
+
+A plan has:
+- Title and overview
+- Status (proposed -> active -> completed)
+- Items with titles, descriptions, acceptance criteria, and status
+- Optional links to spec nodes the items implement
+- Optional witness references for testable criteria
+
+## Validate
+
+```bash
+clayers validate clayers/{{PROJECT_NAME}}/
+```
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-execute-plan" format="markdown"><![CDATA[
+---
+name: clayers-execute-plan
+description: >
+  Execute plan items from the spec with TDD, artifact mapping, and
+  status tracking. Use when: "execute plan", "implement plan items",
+  "start implementing".
+allowed-tools:
+  - Bash(clayers validate *)
+  - Bash(clayers artifact *)
+  - Bash(clayers connectivity *)
+  - Bash(clayers query *)
+---
+
+# Clayers Execute Plan
+
+Execute a plan from **{{PROJECT_NAME}}**'s specification.
+
+## Find Plans
+
+```bash
+clayers query '//pln:plan/pln:title' clayers/{{PROJECT_NAME}}/ --text
+clayers query '//pln:plan[pln:status="active" or pln:status="proposed"]' clayers/{{PROJECT_NAME}}/
+```
+
+Pick an active or proposed plan to execute.
+
+## Read Artifact Layer Guidance
+
+The artifact layer's onboard mode contains the mapping guidance you'll need
+for each implemented item:
+
+```bash
+clayers query '//lyr:mode[@id="mode-art-onboard"]' clayers/{{PROJECT_NAME}}/
+```
+
+## Execute Items
+
+For each pending item in the plan:
+
+1. **Read the item**: title, description, acceptance criteria
+2. **Implement with TDD**:
+   - Write a failing test
+   - Run it, verify it fails
+   - Write minimal implementation
+   - Run it, verify it passes
+3. **Create artifact mapping**: follow the artifact layer's onboard mode
+   guidance to link new code to the spec node it implements
+4. **Fix hashes**:
+   ```bash
+   clayers artifact --fix-node-hash clayers/{{PROJECT_NAME}}/
+   clayers artifact --fix-artifact-hash clayers/{{PROJECT_NAME}}/
+   ```
+5. **Update item status**: change `pln:item-status` from `pending` to `completed`
+6. **Validate**: `clayers validate clayers/{{PROJECT_NAME}}/`
+7. **Commit**: spec + code together, one commit per item
+
+## After All Items
+
+Run quality checks to verify clean state:
+
+```bash
+clayers artifact --coverage clayers/{{PROJECT_NAME}}/
+clayers artifact --drift clayers/{{PROJECT_NAME}}/
+clayers connectivity clayers/{{PROJECT_NAME}}/
+```
+
+Update the plan's status from `active` to `completed`.
+]]></llm:node>
+
+  <llm:node ref="skill-clayers-context" format="markdown"><![CDATA[
+---
+name: clayers-context
+description: >
+  Build a focused context brief for a natural-language question against
+  a clayers spec. Runs semantic search to find landing points, filters
+  them with an LLM judge, traverses relation/terminology/artifact edges
+  via subagents, and assembles a tight markdown summary. Keeps the main
+  agent's context lean by fanning heavy reading out to subagents.
+  Use when: "give me context on X", "what does the spec say about X",
+  "how does X work here", "orient me on X in this clayers project".
+allowed-tools:
+  - Bash(clayers search *)
+  - Bash(clayers query *)
+  - Agent
+---
+
+# Clayers Context
+
+Given a user question about **{{PROJECT_NAME}}**, produce a focused
+markdown brief of relevant spec nodes — terms, prose sections,
+related nodes, and artifact pointers — without pulling walls of XML
+into the main agent's context.
+
+This skill fans out work to subagents at every phase that could leak
+bulk content. The main agent's context only receives small structured
+verdicts. The full assembled brief is the only large output, and it
+contains only filtered, relevant material.
+
+## Four phases
+
+### Phase 1 — Landing points (semantic search, multi-variant)
+
+Generate 1–2 paraphrases of the user's question first (cheap LLM work
+you do directly as the main agent). Example: "staleness detection" →
+"hash-based drift detection", "spec content change detection". Single
+query recall is borderline on vocabulary-mismatch questions, so issue
+multiple variants and union.
+
+Run one CLI call with all variants via the repeatable `--also` flag:
+
+```bash
+clayers search "<raw>" clayers/{{PROJECT_NAME}}/ --also "<paraphrase 1>" --also "<paraphrase 2>" --k 10 --json
+```
+
+Output is a JSON array of
+`{id, file, line_start, line_end, layer, score, text_score,
+struct_score, preview}` — already unioned by id with max score per
+node and sorted descending. No manual merge needed. See the
+`search-multi-query` section in the spec for the semantics.
+
+**Do not apply an absolute score threshold for no-match.** Nonsense
+queries still produce scores around 0.4. The no-match signal comes
+from Phase 2 returning empty `keep_ids`.
+
+Optional post-filters you may add to the CLI call when the question
+shape warrants it:
+
+- `--layer prose --layer terminology` when the question asks about
+  concepts rather than code.
+- `--xpath '//*[not(ancestor-or-self::art:mapping)]'` to exclude
+  artifact mappings when the user wants conceptual material.
+
+### Phase 2 — Judge (precision filter, one subagent)
+
+Dispatch one subagent with the original user question and all ≤10
+landing records (id + preview + score) using this strict contract:
+
+> Return ONLY a JSON object with keys `keep_ids` (list of strings),
+> `drop_ids` (list of strings), `reasons` (list of strings, one per
+> id in `keep_ids` then one per id in `drop_ids`, in that order).
+> Every input id must appear in exactly one of the two lists. Give
+> short original justifications; do not quote previews back. Return
+> no prose, no markdown fences, no content outside the JSON.
+
+**If `keep_ids` is empty, stop.** Emit a user-facing message:
+"No relevant spec material found in clayers/{{PROJECT_NAME}}/ for
+this question." Do not enter Phase 3 or 4. Empty `keep_ids` is the
+sole no-match signal.
+
+### Phase 3 — Traverse three edge kinds (main agent fans out; subagent judges)
+
+**Why this phase is split main-vs-sub this way.** Claude Opus 4.7 does
+not support prefill, which means tool-using subagents narrate their
+reasoning between tool calls no matter how strictly the prompt forbids
+it. Empirically, subagents that receive pre-fetched data and make
+only judgment calls comply with strict JSON contracts perfectly (no
+leakage). So Phase 3 keeps the six structural queries and the peek
+fetches in the main agent — they are deterministic, small, and do
+not need LLM judgment — and uses one subagent per landing node for
+the single thing an LLM must do: decide relevance.
+
+**For each id in `keep_ids`, the main agent runs one `clayers
+neighbors` call and dispatches one judge subagent with the result.**
+The CLI does edge discovery, dedupe, hub pre-filter, and peek lookup
+in a single combined-document pass — replacing the older 6+N
+`clayers query` fan-out per landing.
+
+```bash
+clayers neighbors <LANDING_ID> clayers/{{PROJECT_NAME}}/ --json
+```
+
+Flags (all optional):
+
+- `--hub-threshold N` (default 12) — apply the bucket-diversity hub
+  pre-filter when combined degree exceeds this.
+- `--top-per-bucket N` (default 2) — when the hub filter engages,
+  keep this many per edge-kind bucket (`artifact-map`, `relation`,
+  `term-ref`).
+- `--peek-chars N` (default 350) — truncate peek strings.
+
+Output shape:
+
+```json
+{
+  "landing_id": "...",
+  "degree_observed": 17,
+  "neighbors_by_edge_kind": {"relation": 8, "term-ref": 3, "artifact-map": 6},
+  "hub_engaged": true,
+  "candidates": [
+    {"id": "...", "edge_kind": "artifact-map", "peek": "..."},
+    {"id": "...", "edge_kind": "relation", "edge_subtype": "depends-on", "peek": "..."},
+    {"id": "...", "edge_kind": "term-ref", "peek": "..."}
+  ]
+}
+```
+
+Then dispatch ONE subagent per landing with the original user
+question, the bundle, and this contract:
+
+> Return ONLY a JSON object with keys:
+>
+> - `node_id` (string, equals the landing id)
+> - `kept_neighbors` (list of `{id, edge_kind, reason, snippet}`;
+>   `snippet` is one sentence)
+> - `dropped_count` (integer)
+> - `degree_observed` (integer; equals the number of candidates you
+>   were given)
+> - `neighbors_by_edge_kind` (object mapping `edge_kind` → total
+>   candidate count for that kind)
+>
+> Every candidate id must appear either in `kept_neighbors` or be
+> counted in `dropped_count`. `edge_kind` values: `"relation"`,
+> `"term-ref"`, `"artifact-map"`.
+>
+> Response rules: your entire output must be one parseable JSON
+> object. No markdown fences, no prose preamble or trailing
+> commentary. Do not quote the peek text back; write fresh one-line
+> reasons.
+
+This subagent has no tools — it only classifies pre-provided data.
+That is why its output is reliably narrative-free.
+
+**Traversal control** lives inside `clayers neighbors`:
+
+- **Hub pre-filter at K = 12 with edge-kind diversity** (default).
+  When combined degree > 12, candidates are partitioned into three
+  buckets (`artifact-map`, `relation:*`, `term-ref`) and the top 2
+  from each bucket are kept, ranked within bucket by relation-type
+  priority (`implements` > `depends-on` > `refines` > `precedes` >
+  `constrains` > rest). Result: 6 neighbors spanning all reachable
+  edge kinds — rare-but-valuable term-refs aren't starved by dense
+  artifact-map traffic.
+- **Max depth: 1 hop** (from the landing). Phase 2's `keep_ids`
+  already represent the semantically-confirmed first layer; Phase 3
+  expands each by one step and relies on Phase 4 synthesis to tie
+  them into the answer.
+- **No peek budget** needed — `clayers neighbors` caps output at
+  `top_per_bucket * 3` = 6 per landing, so peek volume is bounded
+  by keep-set size × 6.
+
+### Phase 4 — Direct answer (main agent)
+
+For each id in the union of `keep_ids` (Phase 2) and kept neighbors
+(Phase 3), run:
+
+```bash
+clayers query '//*[@id="ID"]' clayers/{{PROJECT_NAME}}/
+clayers query '//art:mapping[art:spec-ref/@node="ID"]' clayers/{{PROJECT_NAME}}/
+```
+
+These return full XML. Artifact mappings yield file paths with line
+ranges — **use those line ranges inline in the answer**. Specific
+locators like `crates/foo/src/bar.rs:94-175` are high-value for the
+reader and the single easiest way to let them drill deeper.
+
+**Answer the user's question directly**, synthesizing across the
+kept nodes. Use structure (**bold labels**, numbered steps, inline
+code) when it clarifies the answer. Organize by question topic, not
+by spec id — a document dump with one section per kept node is the
+failure mode.
+
+### Output template
+
+Typical shape:
+
+```
+<Opening sentence or paragraph that directly answers the question,
+citing specific ids inline in backticks and line ranges where
+available, e.g.: "Drift is divergence between a spec node and its
+mapped artifact (`term-drift`), detected via stored C14N hashes
+against current content (`drift-detection-tooling`, implemented in
+`crates/clayers-spec/src/drift.rs:94-175`)."
+
+Follow with additional structure as the question warrants:
+- **Bold labels** with short explanations for list-of-parts answers
+- Numbered steps for how-does-X-work answers
+- Inline code for identifiers, file paths, and line ranges
+
+Keep it grounded in the kept nodes. Cite the id (backticks) and
+path:line-range (where artifact-mapped) each time you make a
+load-bearing claim.>
+
+References: <id-1>, <id-2>, <id-3>, … <id-N>
+```
+
+Rules:
+
+- **No preamble.** Do not say "Now I have the material" or "Let me
+  assemble the brief" or anything before the answer. First output
+  character is the first character of the answer.
+- **No trailing summary.** The structured answer IS the summary —
+  don't append another "In summary, …" paragraph.
+- **Don't dump per kept node.** If the same id is relevant to two
+  parts of the answer, cite it in both; it's fine — what you're
+  avoiding is a `## <id>` section per kept node.
+- **Cite line ranges where you have them.** Phase 3's
+  `artifact-map` candidates carry file paths and line ranges; surface
+  them inline. A claim about code without a locator is weaker than
+  one with `path:start-line-end-line`.
+- **References line** lists all cited ids, flat, descending
+  relevance. Short — don't re-describe each id on that line.
+- **Target: ≤ 1200 output tokens.** Concision still wins; structure
+  is for clarity, not volume. Longer is only justified when the
+  question genuinely requires enumeration (listing all N layers,
+  stepping through an N-stage pipeline).
+- **If Phase 2 returned empty `keep_ids`**, emit the one-line
+  no-match message and stop.
+
+## Subagent return contracts (strict)
+
+- **Phase 2 judge**: `{keep_ids[], drop_ids[], reasons[]}`. Empty
+  `keep_ids` is the no-match signal.
+- **Phase 3 traverser**: `{node_id, kept_neighbors: [{id, edge_kind,
+  reason, snippet}], dropped_count, degree_observed,
+  neighbors_by_edge_kind}`. `edge_kind` is one of `"relation"`,
+  `"term-ref"`, or `"artifact-map"`.
+
+Never accept subagent output that contains raw XML or narrative prose
+outside the contract keys. If a subagent leaks, redispatch once with
+a tightened prompt; on a second leak, drop the leaked content and
+continue with what parses cleanly.
+
+## When to invoke
+
+Good fits:
+
+- "How does X work in this project?" — pulls concept + implementing
+  code.
+- "What's the design rationale for Y?" — pulls decisions and related
+  relations.
+- "Orient me on subsystem Z." — pulls the connected subgraph.
+
+Bad fits (use other skills instead):
+
+- "Onboard me to clayers" — use `clayers-onboard`.
+- "Brainstorm a feature" — use `clayers-brainstorm`.
+- "Review artifact coverage" — use `clayers-review-artifacts`.
+]]></llm:node>
+
+  <!-- ================================================================== -->
+  <!-- Artifact mappings for agent guidance nodes                         -->
+  <!-- ================================================================== -->
+
+  <art:mapping id="map-skill-clayers-review-artifacts">
+    <art:spec-ref node="skill-clayers-review-artifacts"
+              revision="draft-1"
+              node-hash="sha256:f5d4311e728308600b2dbc8c3f1aa9e5a1e62677894988f4a4ce8b2dbc8aa74f"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="9191483"
+              path="crates/clayers/src/adopt.rs">
+      <art:range hash="sha256:1abb41c9296f2c133a1265a0432727656997cee7e3644ae017f4f5abde9d951c"
+                 start-line="240" end-line="260"/>
+    </art:artifact>
+    <art:coverage>partial</art:coverage>
+    <art:note>plant_skills extracts and writes the review-artifacts
+    skill from embedded guidance XML to .claude/skills/.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-skill-clayers-onboard">
+    <art:spec-ref node="skill-clayers-onboard"
+              revision="draft-1"
+              node-hash="sha256:a786c9501b0235b3d12f554ffc2de81bf0048757b5ba5494893a94b15f68d120"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="9191483"
+              path="crates/clayers/src/adopt.rs">
+      <art:range hash="sha256:1abb41c9296f2c133a1265a0432727656997cee7e3644ae017f4f5abde9d951c"
+                 start-line="240" end-line="260"/>
+    </art:artifact>
+    <art:coverage>partial</art:coverage>
+    <art:note>plant_skills extracts and writes the onboard skill from
+    embedded guidance XML to .claude/skills/.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-agent-workflow-instructions">
+    <art:spec-ref node="agent-workflow-instructions"
+              revision="draft-1"
+              node-hash="sha256:6fd5faf4e547af9f31cdfbe68de73bb046fa1739d32fc27fdc3591a1151383a7"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="9191483"
+              path="crates/clayers/src/adopt.rs">
+      <art:range hash="sha256:07a8c63ed59ebb54b1f4b7798d4b095cfca2224cf452a23283a8abbcb75534bb"
+                 start-line="16" end-line="31"/>
+      <art:range hash="sha256:1ab87f251c5ca25beb244bfa2924b31dcf7d3cc69ac210db215b130dc124d354"
+                 start-line="378" end-line="422"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>extract_from_guidance retrieves workflow content (16-31),
+    amend_agent_file injects it into AGENTS.md/CLAUDE.md (378-422).</art:note>
+  </art:mapping>
+
+</spec:clayers>

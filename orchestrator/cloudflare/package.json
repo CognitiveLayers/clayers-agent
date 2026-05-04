@@ -1,0 +1,20 @@
+{
+  "name": "@cognitivelayers/clayers-orchestrator-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker control plane for Clayers orchestration containers.",
+  "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260504.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.87.0"
+  }
+}

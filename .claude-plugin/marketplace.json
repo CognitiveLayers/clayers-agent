@@ -1,0 +1,27 @@
+{
+  "name": "clayers-plugins",
+  "owner": {
+    "name": "Cognitive Layers"
+  },
+  "metadata": {
+    "description": "Claude Code plugins for invoking Clayers-owned local workflows.",
+    "version": "0.1.0",
+    "pluginRoot": "./claude-plugin"
+  },
+  "plugins": [
+    {
+      "name": "clayers",
+      "source": "./claude-plugin",
+      "description": "Run Clayers-owned local workflows from Claude Code.",
+      "version": "0.1.0",
+      "category": "development",
+      "tags": [
+        "clayers",
+        "specs",
+        "traceability",
+        "documentation",
+        "agents"
+      ]
+    }
+  ]
+}

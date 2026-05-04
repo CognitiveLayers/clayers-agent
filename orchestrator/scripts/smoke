@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+orchestrator_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+repo_root="$(CDPATH= cd -- "$orchestrator_root/.." && pwd)"
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || {
+    printf 'missing required command: %s\n' "$1" >&2
+    exit 1
+  }
+}
+
+need git
+need node
+need curl
+need rg
+
+cd "$orchestrator_root"
+if [ ! -x node_modules/.bin/tsc ]; then
+  npm_config_cache="${npm_config_cache:-/tmp/clayers-npm-cache}" npm ci >/dev/null
+fi
+npm run build >/dev/null
+scripts/clayers-check >/dev/null
+
+tmp="$(mktemp -d /tmp/clayers-orchestrator-smoke.XXXXXX)"
+repo="$tmp/repo"
+work="$tmp/work"
+port="$((38000 + RANDOM % 20000))"
+
+mkdir -p "$repo" "$work"
+(
+  cd "$repo"
+  git init -q
+  printf '# Smoke Repo\n\nSmall repo for Clayers orchestrator smoke checks.\n' > README.md
+)
+
+server_log="$tmp/server.log"
+CLAYERS_ORCHESTRATOR_WORKDIR="$work" \
+  node "$orchestrator_root/dist/server.js" --host 127.0.0.1 --port "$port" >"$server_log" 2>&1 &
+server_pid="$!"
+
+cleanup() {
+  kill "$server_pid" >/dev/null 2>&1 || true
+  if [ -n "${watch_pid:-}" ]; then
+    kill "$watch_pid" >/dev/null 2>&1 || true
+  fi
+}
+trap cleanup EXIT
+
+for _ in $(seq 1 80); do
+  if curl -fsS "http://127.0.0.1:$port/health" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.1
+done
+
+if ! curl -fsS "http://127.0.0.1:$port/health" >/dev/null; then
+  printf 'orchestrator did not become healthy\n' >&2
+  sed -n '1,160p' "$server_log" >&2
+  exit 1
+fi
+
+client_log="$tmp/client.log"
+node "$orchestrator_root/dist/client.js" submit \
+  --host "http://127.0.0.1:$port" \
+  --path "$repo" \
+  --mode sync \
+  --stream >"$client_log"
+
+rg -q "job.completed|job.completed_with_issues" "$client_log"
+rg -q "clayers.adopt" "$client_log"
+rg -q "clayers.validate" "$client_log"
+
+watch_log="$tmp/watch.log"
+node "$orchestrator_root/dist/client.js" watch \
+  --host "http://127.0.0.1:$port" \
+  --path "$repo" \
+  --mode review \
+  --no-initial \
+  --once \
+  --interval-ms 100 \
+  --debounce-ms 100 >"$watch_log" 2>&1 &
+watch_pid="$!"
+
+for _ in $(seq 1 80); do
+  if rg -q "\\[watch\\] monitoring" "$watch_log"; then
+    break
+  fi
+  sleep 0.1
+done
+
+if ! rg -q "\\[watch\\] monitoring" "$watch_log"; then
+  printf 'watcher did not start\n' >&2
+  sed -n '1,160p' "$watch_log" >&2
+  exit 1
+fi
+
+printf '\nWatcher smoke change.\n' >> "$repo/README.md"
+wait "$watch_pid"
+watch_pid=""
+
+rg -q "\\[watch\\] submitting review job" "$watch_log"
+rg -q "job.completed|job.completed_with_issues" "$watch_log"
+
+claude_helper="$repo_root/claude-plugin/bin/clayers-orchestrator"
+if [ -x "$claude_helper" ]; then
+  "$claude_helper" watch --help >/dev/null
+  claude_helper_log="$tmp/claude-helper.log"
+  "$claude_helper" submit \
+    --host "http://127.0.0.1:$port" \
+    --path "$repo" \
+    --mode review \
+    --stream >"$claude_helper_log"
+  rg -q "job.completed|job.completed_with_issues" "$claude_helper_log"
+fi
+
+codex_helper="$repo_root/plugins/clayers/scripts/clayers-orchestrator"
+if [ -x "$codex_helper" ]; then
+  "$codex_helper" watch --help >/dev/null
+  codex_helper_log="$tmp/codex-helper.log"
+  "$codex_helper" submit \
+    --host "http://127.0.0.1:$port" \
+    --path "$repo" \
+    --mode review \
+    --stream >"$codex_helper_log"
+  rg -q "job.completed|job.completed_with_issues" "$codex_helper_log"
+fi
+
+printf 'OK   orchestrator smoke test\n'

@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fix=1
+spec_dir=""
+
+usage() {
+  cat <<'USAGE'
+Usage: clayers-quality-suite [--no-fix] [SPEC_DIR]
+
+Runs the local Clayers quality loop for a spec.
+
+By default this fixes node and artifact hashes before checking validation,
+drift, coverage, and connectivity. Use --no-fix for read-only review.
+USAGE
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --no-fix)
+      fix=0
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [ -n "$spec_dir" ]; then
+        printf 'error: unexpected argument: %s\n' "$1" >&2
+        usage >&2
+        exit 2
+      fi
+      spec_dir="$1"
+      shift
+      ;;
+  esac
+done
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$repo_root"
+
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+resolve_clayers() {
+  if [ -n "${CLAYERS_BIN:-}" ] && [ -x "$CLAYERS_BIN" ]; then
+    printf '%s\n' "$CLAYERS_BIN"
+    return 0
+  fi
+  if command -v clayers-bootstrap >/dev/null 2>&1; then
+    clayers-bootstrap --install --print-bin
+    return 0
+  fi
+  if [ -x "$script_dir/clayers-bootstrap" ]; then
+    "$script_dir/clayers-bootstrap" --install --print-bin
+    return 0
+  fi
+  if command -v clayers >/dev/null 2>&1; then
+    command -v clayers
+    return 0
+  fi
+  printf 'error: core clayers is unavailable and clayers-bootstrap was not found\n' >&2
+  return 1
+}
+
+clayers_bin="$(resolve_clayers)"
+
+if [ -z "$spec_dir" ]; then
+  project_name="$(basename "$repo_root")"
+  if [ -f "clayers/$project_name/index.xml" ]; then
+    spec_dir="clayers/$project_name"
+  else
+    mapfile -t candidates < <(find clayers -mindepth 2 -maxdepth 2 -type f -name index.xml 2>/dev/null | sed 's#/index.xml$##' | sort)
+    if [ "${#candidates[@]}" -eq 1 ]; then
+      spec_dir="${candidates[0]}"
+    else
+      printf 'error: could not determine spec directory; pass SPEC_DIR explicitly\n' >&2
+      exit 2
+    fi
+  fi
+fi
+
+if [ ! -f "$spec_dir/index.xml" ]; then
+  printf 'error: %s does not look like a Clayers spec directory\n' "$spec_dir" >&2
+  exit 2
+fi
+
+run() {
+  printf '\n> %s\n' "$*"
+  "$@"
+}
+
+printf 'clayers quality suite: %s\n' "$spec_dir"
+
+if [ "$fix" -eq 1 ]; then
+  run "$clayers_bin" artifact --fix-node-hash "$spec_dir"
+  run "$clayers_bin" artifact --fix-artifact-hash "$spec_dir"
+fi
+
+run "$clayers_bin" validate "$spec_dir"
+run "$clayers_bin" artifact --drift "$spec_dir"
+run "$clayers_bin" artifact --coverage "$spec_dir"
+run "$clayers_bin" connectivity "$spec_dir"

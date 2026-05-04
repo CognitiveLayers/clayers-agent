@@ -1,0 +1,24 @@
+[package]
+name = "clayers-spec"
+version = "0.2.1"
+edition = "2024"
+license = "Apache-2.0"
+description = "Spec-aware logic for clayers (validate, drift, coverage, connectivity)"
+repository = "https://github.com/CognitiveLayers/clayers"
+
+[dependencies]
+clayers-xml = { version = "0.2.1", path = "../clayers-xml" }
+petgraph = "0.8"
+serde = { version = "1", features = ["derive"] }
+sha2 = "0.10"
+thiserror = "2"
+# Temporary republish of our fork pending upstream PRs; switch back to
+# `uppsala` once a crates.io release with both fixes is available.
+uppsala = { version = "0.3.0", package = "clayers-xml-uppsala" }
+xot = "0.31"
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints]
+workspace = true

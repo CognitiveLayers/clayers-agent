@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$repo_root"
+
+ok() {
+  printf 'OK   %s\n' "$1"
+}
+
+fail() {
+  printf 'FAIL %s\n' "$1" >&2
+  exit 1
+}
+
+json_file() {
+  jq . "$1" >/dev/null
+  ok "json: $1"
+}
+
+shell_file() {
+  bash -n "$1"
+  ok "shell: $1"
+}
+
+require_no_placeholder() {
+  if rg -n "TODO|\\[TODO|FIXME|TBD|PLACEHOLDER|placeholder" "$1" >/dev/null; then
+    rg -n "TODO|\\[TODO|FIXME|TBD|PLACEHOLDER|placeholder" "$1" >&2
+    fail "placeholder text found in $1"
+  fi
+  ok "no placeholders: $1"
+}
+
+json_file ".claude-plugin/marketplace.json"
+json_file "claude-plugin/.claude-plugin/plugin.json"
+json_file "plugins/clayers/.codex-plugin/plugin.json"
+json_file "plugins/clayers/.mcp.json"
+json_file "codex-marketplace.json"
+json_file "orchestrator/package.json"
+json_file "orchestrator/cloudflare/package.json"
+json_file "orchestrator/cloudflare/wrangler.json"
+
+[ -f ".github/workflows/plugin-release.yml" ] || fail "missing CI workflow: .github/workflows/plugin-release.yml"
+ok "ci workflow: .github/workflows/plugin-release.yml"
+
+[ -f "LICENSE" ] || fail "missing root LICENSE"
+ok "root license: LICENSE"
+
+for path in clayers-core claude-plugin plugins/clayers orchestrator .claude-plugin .github/workflows scripts; do
+  [ -d "$path" ] || fail "missing release directory: $path"
+  ok "release directory: $path"
+done
+
+[ -f "orchestrator/Dockerfile" ] || fail "missing runner container Dockerfile"
+ok "runner container Dockerfile: orchestrator/Dockerfile"
+
+[ -f "orchestrator/src/watcher.ts" ] || fail "missing local watcher: orchestrator/src/watcher.ts"
+ok "local watcher source: orchestrator/src/watcher.ts"
+
+if find orchestrator/src orchestrator/cloudflare/src -name '*.js' -print -quit | rg . >/dev/null; then
+  find orchestrator/src orchestrator/cloudflare/src -name '*.js' >&2
+  fail "orchestrator source must be TypeScript"
+fi
+ok "orchestrator source is TypeScript"
+
+require_no_placeholder ".claude-plugin/marketplace.json"
+require_no_placeholder "claude-plugin/.claude-plugin/plugin.json"
+require_no_placeholder "plugins/clayers/.codex-plugin/plugin.json"
+require_no_placeholder "codex-marketplace.json"
+require_no_placeholder "orchestrator/clayers/orchestrator/revision.xml"
+
+shell_file "claude-plugin/bin/clayers-bootstrap"
+shell_file "claude-plugin/bin/clayers-preflight"
+shell_file "claude-plugin/bin/clayers-quality-suite"
+shell_file "claude-plugin/bin/clayers-orchestrator"
+shell_file "plugins/clayers/scripts/clayers-bootstrap"
+shell_file "plugins/clayers/scripts/clayers-preflight"
+shell_file "plugins/clayers/scripts/clayers-quality-suite"
+shell_file "plugins/clayers/scripts/clayers-orchestrator"
+shell_file "scripts/build-release-repo"
+shell_file "scripts/smoke-install"
+shell_file "scripts/sync-codex-marketplace"
+shell_file "orchestrator/scripts/check"
+shell_file "orchestrator/scripts/smoke"
+shell_file "orchestrator/scripts/clayers-check"
+shell_file "orchestrator/scripts/self-sync"
+shell_file "orchestrator/cloudflare/scripts/check"
+
+orchestrator/scripts/check >/dev/null
+ok "orchestrator TypeScript checks"
+
+orchestrator/cloudflare/scripts/check >/dev/null
+ok "Cloudflare Worker TypeScript checks"
+
+orchestrator/scripts/smoke >/dev/null
+ok "orchestrator smoke test"
+
+skill_file() {
+  file="$1"
+  [ -f "$file" ] || fail "missing skill file: $file"
+  python3 - "$file" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text()
+if not text.startswith("---\n"):
+    raise SystemExit(f"{path}: missing YAML frontmatter")
+end = text.find("\n---\n", 4)
+if end == -1:
+    raise SystemExit(f"{path}: unterminated YAML frontmatter")
+frontmatter = text[4:end]
+fields = {}
+for line in frontmatter.splitlines():
+    if ":" in line:
+        key, value = line.split(":", 1)
+        fields[key.strip()] = value.strip()
+for required in ("name", "description"):
+    if not fields.get(required):
+        raise SystemExit(f"{path}: missing {required}")
+PY
+  ok "skill: $file"
+}
+
+skill_file "plugins/clayers/skills/clayers-adopt/SKILL.md"
+skill_file "plugins/clayers/skills/clayers-generate/SKILL.md"
+skill_file "plugins/clayers/skills/clayers-review/SKILL.md"
+
+core_version="$(sed -n 's/^version = "\(.*\)"/\1/p' clayers-core/crates/clayers/Cargo.toml | head -n 1)"
+claude_version="$(tr -d '[:space:]' < claude-plugin/CLAYERS_VERSION)"
+codex_version="$(tr -d '[:space:]' < plugins/clayers/CLAYERS_VERSION)"
+
+[ "$core_version" = "$claude_version" ] || fail "Claude CLAYERS_VERSION $claude_version does not match core $core_version"
+[ "$core_version" = "$codex_version" ] || fail "Codex CLAYERS_VERSION $codex_version does not match core $core_version"
+ok "core/plugin Clayers versions match: $core_version"
+
+claude-plugin/bin/clayers-bootstrap --check >/dev/null
+ok "Claude bootstrap locates core Clayers"
+
+plugins/clayers/scripts/clayers-bootstrap --check >/dev/null
+ok "Codex bootstrap locates core Clayers"
+
+claude-plugin/bin/clayers-preflight >/dev/null
+ok "Claude preflight runs"
+
+plugins/clayers/scripts/clayers-preflight >/dev/null
+ok "Codex preflight runs"
+
+(
+  cd clayers-core
+  ../claude-plugin/bin/clayers-quality-suite --no-fix clayers/clayers >/dev/null
+)
+ok "Claude quality suite passes against clayers-core"
+
+(
+  cd clayers-core
+  ../plugins/clayers/scripts/clayers-quality-suite --no-fix clayers/clayers >/dev/null
+)
+ok "Codex quality suite passes against clayers-core"
+
+if [ -d .agents ] && rg -n "TODO|\\[TODO" .agents >/dev/null 2>&1; then
+  printf 'WARN .agents contains local placeholder metadata; release uses codex-marketplace.json instead.\n'
+fi
+
+ok "release check complete"

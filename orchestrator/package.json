@@ -1,0 +1,25 @@
+{
+  "name": "@cognitivelayers/clayers-orchestrator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Clayers orchestration service with realtime job events.",
+  "bin": {
+    "clayers-orchestrator": "./bin/clayers-orchestrator"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "npm run build && node dist/server.js",
+    "check": "scripts/check",
+    "smoke": "scripts/smoke",
+    "clayers:check": "scripts/clayers-check",
+    "clayers:self-sync": "scripts/self-sync"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.2",
+    "typescript": "^5.9.3"
+  }
+}

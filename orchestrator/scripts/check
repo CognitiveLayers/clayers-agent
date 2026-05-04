@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+orchestrator_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$orchestrator_root"
+
+if [ ! -x node_modules/.bin/tsc ]; then
+  npm_config_cache="${npm_config_cache:-/tmp/clayers-npm-cache}" npm ci >/dev/null
+fi
+
+npm run build >/dev/null
+bash -n scripts/check
+bash -n scripts/smoke
+bash -n scripts/clayers-check
+bash -n scripts/self-sync
+
+printf 'OK   orchestrator TypeScript checks\n'

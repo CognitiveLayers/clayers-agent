@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+dest="${1:-}"
+
+if [ -z "$dest" ]; then
+  dest="$(mktemp -d /tmp/clayers-plugins-release.XXXXXX)"
+else
+  mkdir -p "$dest"
+  if [ -n "$(find "$dest" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+    printf 'destination is not empty: %s\n' "$dest" >&2
+    exit 1
+  fi
+fi
+
+cd "$repo_root"
+
+mkdir -p "$dest/.agents/plugins" "$dest/.claude-plugin" "$dest/.github/workflows" "$dest/plugins"
+
+rsync -a --exclude '.git' --exclude 'target' --exclude '.DS_Store' clayers-core/ "$dest/clayers-core/"
+rsync -a --exclude '.DS_Store' claude-plugin/ "$dest/claude-plugin/"
+rsync -a --exclude '.DS_Store' plugins/clayers/ "$dest/plugins/clayers/"
+rsync -a --exclude '.git' --exclude '.DS_Store' --exclude '.claude' --exclude 'node_modules' --exclude 'dist' --exclude '.wrangler' orchestrator/ "$dest/orchestrator/"
+rsync -a scripts/ "$dest/scripts/"
+
+cp README.md INSTALLATION.md RELEASE.md LICENSE .gitignore codex-marketplace.json "$dest/"
+cp .claude-plugin/marketplace.json "$dest/.claude-plugin/marketplace.json"
+cp codex-marketplace.json "$dest/.agents/plugins/marketplace.json"
+cp .github/workflows/plugin-release.yml "$dest/.github/workflows/plugin-release.yml"
+
+printf 'release repository materialized at: %s\n' "$dest"

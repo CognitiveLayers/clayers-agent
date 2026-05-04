@@ -1,0 +1,14 @@
+/target
+proptest-regressions/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.swp
+*.swo
+*~
+.DS_Store
+docs/superpowers/
+
+# Benchmark run outputs — per-run JSON results, not source
+experiments/context-skill-benchmark/results-*.json

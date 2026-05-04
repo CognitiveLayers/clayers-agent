@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cloudflare_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$cloudflare_root"
+
+if [ ! -x node_modules/.bin/tsc ]; then
+  npm_config_cache="${npm_config_cache:-/tmp/clayers-npm-cache}" npm ci >/dev/null
+fi
+
+npm run check >/dev/null
+jq . wrangler.json >/dev/null
+bash -n scripts/check
+
+printf 'OK   Cloudflare Worker TypeScript checks\n'

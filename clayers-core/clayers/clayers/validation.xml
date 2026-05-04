@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Validation: How cross-layer references are validated via
+  combined document assembly and dynamic schema generation.
+-->
+<spec:clayers xmlns:spec="urn:clayers:spec"
+       xmlns:pr="urn:clayers:prose"
+       xmlns:trm="urn:clayers:terminology"
+       xmlns:org="urn:clayers:organization"
+       xmlns:rel="urn:clayers:relation"
+       xmlns:art="urn:clayers:artifact"
+       xmlns:llm="urn:clayers:llm"
+       spec:index="index.xml">
+
+  <!-- Vocabulary -->
+
+  <trm:term id="term-combined-document">
+    <trm:name>Combined Document</trm:name>
+    <trm:definition>An assembled XML document containing content elements from all
+    layer files of a specification, wrapped in a cmb:spec element. The validator
+    unwraps children from each file's clayers root and validates the
+    combined result against a dynamically generated combined schema, which
+    enforces both structural validity per layer and cross-layer referential
+    integrity via xs:unique and xs:keyref.</trm:definition>
+  </trm:term>
+
+  <trm:term id="term-cross-layer-ref">
+    <trm:name>Cross-Layer Reference</trm:name>
+    <trm:definition>An attribute in one layer that points to a node ID defined in
+    a different layer. Since XSD xs:IDREF is single-document scoped, these use
+    xs:string in individual schemas. The combined schema enforces resolution
+    via xs:keyref against the unified xs:unique constraint on all @id
+    attributes.</trm:definition>
+  </trm:term>
+
+  <!-- Content -->
+
+  <pr:section id="cross-layer-integrity">
+    <pr:title>Cross-Layer Referential Integrity</pr:title>
+    <pr:shortdesc>How references between layers are validated.</pr:shortdesc>
+
+    <pr:p>XSD xs:IDREF is strictly single-document scoped. Since each layer is a
+    separate document, <trm:ref term="term-cross-layer-ref">cross-layer
+    references</trm:ref> use xs:string in their individual schemas. Referential
+    integrity is enforced at the combined document level.</pr:p>
+
+    <pr:p>The validator assembles a
+    <trm:ref term="term-combined-document">combined document</trm:ref> from
+    all layer files listed in the index. At validation time, the tool
+    dynamically generates a combined schema by scanning layer schemas for
+    appinfo annotations. The generated schema defines:</pr:p>
+
+    <pr:ul>
+      <pr:li>An xs:unique constraint collecting all @id attributes across all
+      layers into a unified ID space.</pr:li>
+      <pr:li>xs:keyref constraints for every reference attribute type, declared
+      via <pr:code>spec:keyref</pr:code> annotations in each layer schema's
+      appinfo.</pr:li>
+    </pr:ul>
+
+    <pr:note type="important">xs:unique is used instead of xs:key because the
+    selector .//* matches all descendant elements, including those without
+    @id. xs:unique skips elements missing the field; xs:key would error on
+    them. xs:keyref works against both.</pr:note>
+  </pr:section>
+
+  <pr:section id="validation-flow">
+    <pr:title>Validation</pr:title>
+    <pr:shortdesc>How the validator discovers, assembles, and validates
+    specifications.</pr:shortdesc>
+
+    <pr:p>The CLI tool validates specifications in a single pass by assembling
+    and validating the <trm:ref term="term-combined-document">combined
+    document</trm:ref>. The combined schema is generated dynamically from
+    layer schema annotations, so structural validation and referential
+    integrity checking happen together.</pr:p>
+
+    <pr:steps>
+      <pr:step id="validation-flow-step-discover">Discover XML files from the given path (file or directory).</pr:step>
+      <pr:step id="validation-flow-step-resolve-index">For each file, check if it is an index (has index file entries
+      as children). Otherwise, resolve the index attribute to find its
+      index.</pr:step>
+      <pr:step id="validation-flow-step-read-manifest">For each discovered index, read the file manifest to find all
+      layer files.</pr:step>
+      <pr:step id="validation-flow-step-assemble">Assemble a combined document: create a cmb:spec wrapper element
+      and unwrap children from each layer file's clayers root.</pr:step>
+      <pr:step id="validation-flow-step-generate-schema">Generate the combined schema: scan all layer .xsd files for
+      <pr:code>spec:content-element</pr:code> appinfo markers (for the choice
+      group) and <pr:code>spec:keyref</pr:code> annotations (for referential
+      integrity constraints).</pr:step>
+      <pr:step id="validation-flow-step-validate">Validate the combined document against the generated schema.</pr:step>
+      <pr:step id="validation-flow-step-report">Report results per spec: pass or fail with error details.</pr:step>
+    </pr:steps>
+
+    <pr:p>Namespace discovery is dynamic. The tool scans all .xsd files in the
+    schema directory at startup to build prefix-to-URI mappings, rather than
+    hardcoding them. Layer schemas are the source of truth for namespaces.</pr:p>
+  </pr:section>
+
+  <!-- Topic typing -->
+
+  <org:concept ref="cross-layer-integrity">
+    <org:purpose>Understanding how references between separate XML documents are
+    validated via the combined schema.</org:purpose>
+  </org:concept>
+
+  <org:task ref="validation-flow">
+    <org:purpose>The validator discovers, assembles, and validates specifications.</org:purpose>
+    <org:actor>clayers-cli CLI tool</org:actor>
+  </org:task>
+
+  <!-- Relations -->
+
+  <rel:relation type="refines" from="cross-layer-integrity" to="layered-architecture">
+    <rel:note>Cross-layer integrity is the mechanism that makes the layered
+    architecture's shared ID space actually work.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="validation-flow" to="term-combined-document">
+    <rel:note>The validation process centers on assembling and validating
+    the combined document.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="validation-flow" to="cross-layer-integrity">
+    <rel:note>The validator enforces cross-layer referential integrity as
+    part of its single-pass validation.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="depends-on" from="validation-flow" to="index-layer">
+    <rel:note>The validator uses the index to discover layer files and
+    assemble the combined document.</rel:note>
+  </rel:relation>
+
+  <!-- Artifact mappings -->
+
+  <art:mapping id="map-validation-script">
+    <art:spec-ref node="validation-flow"
+              revision="draft-1"
+              node-hash="sha256:a8659dd840c9fdde4e94ea10f07ab6ea25adb8f52eda6a1002e7f0ad9bc7c3fd"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/validate.rs">
+        <art:range hash="sha256:768442d93bf910d39fb11bc3c8ba082eaaad77a6fb88ab8abd58f04b39dc0e29"
+                   start-line="59" end-line="117"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>clayers-cli implements the full discovery, assembly, and
+    validation flow described in the spec.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-combined-schema-keyref">
+    <art:spec-ref node="cross-layer-integrity"
+              revision="draft-1"
+              node-hash="sha256:e5a6abdf801ee1970d5b8d807c90f702305c98fc94b7fb1a29a759b1be92303a"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/schema.rs">
+        <art:range hash="sha256:563da0f352e1aaf973828b62d88c3797cb6fb531ae72b4a3ec51e295f68692c0"
+                   start-line="125" end-line="176"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Keyref collection from appinfo and keyref generation +
+    xs:unique/xs:keyref output implement cross-layer referential integrity.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-combined-schema-content">
+    <art:spec-ref node="cross-layer-integrity"
+              revision="draft-1"
+              node-hash="sha256:e5a6abdf801ee1970d5b8d807c90f702305c98fc94b7fb1a29a759b1be92303a"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/schema.rs">
+        <art:range hash="sha256:00745af9619d781662368824bf0522635d396422116c06ad45d762de129e3359"
+                   start-line="179" end-line="226"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Content element collection and combined schema assembly
+    for cross-layer referential integrity.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-term-combined-document">
+    <art:spec-ref node="term-combined-document"
+              revision="draft-1"
+              node-hash="sha256:05b70be206ff121ee30bba6918bb21197d11fa6ed4b00c80a8351d6456487ad4"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/assembly.rs">
+        <art:range hash="sha256:452884ce17b400beb1b51f90b38cfc658e5e8b6e7706789e16029914f4d3a4c3"
+                   start-line="16" end-line="56"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>assemble_combined() creates the combined document by unwrapping
+    children from each file's clayers root into a cmb:spec wrapper.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-term-cross-layer-ref-check">
+    <art:spec-ref node="term-cross-layer-ref"
+              revision="draft-1"
+              node-hash="sha256:9168e993a2ffdb4ca14419213a8c99893db616af46a43147d258be9ede1d3c5d"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/validate.rs">
+        <art:range hash="sha256:c8b761df2a0883e44194ca2ea073de6670214be5cf0633356158d6146e01c75c"
+                   start-line="200" end-line="276"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>check_references() and collect_all_ids() implement cross-layer
+    reference checking and ID collection.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-term-cross-layer-ref-relation">
+    <art:spec-ref node="term-cross-layer-ref"
+              revision="draft-1"
+              node-hash="sha256:9168e993a2ffdb4ca14419213a8c99893db616af46a43147d258be9ede1d3c5d"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/validate.rs">
+        <art:range hash="sha256:481b4e08312956f4ceba5b68dfee68c5fd1730f4c4fedebfb7719caa1953f279"
+                   start-line="304" end-line="349"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>check_relation_refs() validates cross-layer reference resolution
+    via xs:keyref constraints.</art:note>
+  </art:mapping>
+
+  <!-- Step-level artifact mappings for validation-flow -->
+
+  <art:mapping id="map-validation-flow-step-discover">
+    <art:spec-ref node="validation-flow-step-discover"
+              revision="draft-1"
+              node-hash="sha256:771d9fa073120192b44cc1a72b6026284e09d24c82280d31d6e8ab4f42bfc30a"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/discovery.rs">
+        <art:range hash="sha256:2c4a9abf59a761e5af72d55c5c8da4b1e5cec4fa782db9b5fc1452293c4817cc"
+                   start-line="15" end-line="33"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>find_xml_files() discovers XML files from the given path.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-resolve-index">
+    <art:spec-ref node="validation-flow-step-resolve-index"
+              revision="draft-1"
+              node-hash="sha256:22931771c5fee1949b1abec3d6850557c2499a8949448ab6881adc2a9d442364"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/discovery.rs">
+        <art:range hash="sha256:78c8ba8c694651e1f3798b16defbba27460c1f37f5a1abb9cd83c41819fdcac6"
+                   start-line="44" end-line="69"/>
+        <art:range hash="sha256:e221ee2deba7a19d23508886668f3d0b655bd03f4dc9dda70130d55120d4edc0"
+                   start-line="157" end-line="171"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>is_index_file() + resolve_index() (207-227) and
+    find_index_files() (598-611) implement index resolution.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-read-manifest">
+    <art:spec-ref node="validation-flow-step-read-manifest"
+              revision="draft-1"
+              node-hash="sha256:56a651358a6846a5e9622055b0745599c0d169b7d31a4d1b035b0cf02edfe6ed"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/discovery.rs">
+        <art:range hash="sha256:78c8ba8c694651e1f3798b16defbba27460c1f37f5a1abb9cd83c41819fdcac6"
+                   start-line="44" end-line="69"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>discover_spec_files() reads the file manifest from index files.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-assemble">
+    <art:spec-ref node="validation-flow-step-assemble"
+              revision="draft-1"
+              node-hash="sha256:a32fac3d2a0c9b2360ecd0c0f931f02df663cb3b7c2d9ec9690a3af237fc39bc"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/assembly.rs">
+        <art:range hash="sha256:452884ce17b400beb1b51f90b38cfc658e5e8b6e7706789e16029914f4d3a4c3"
+                   start-line="16" end-line="56"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>assemble_combined() creates the combined document wrapper.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-generate-schema-discover">
+    <art:spec-ref node="validation-flow-step-generate-schema"
+              revision="draft-1"
+              node-hash="sha256:8ac8dd62e24f0680721fb810bbdd81d441fbc44db185f86b72dc088c81f826d2"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/schema.rs">
+        <art:range hash="sha256:57f9f18e28a0f295b3abbd557b21ba7e237d8e75134a56e0453fc45075caa890"
+                   start-line="27" end-line="95"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Acyclic type discovery and collection functions for
+    combined schema generation.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-generate-schema-collect">
+    <art:spec-ref node="validation-flow-step-generate-schema"
+              revision="draft-1"
+              node-hash="sha256:8ac8dd62e24f0680721fb810bbdd81d441fbc44db185f86b72dc088c81f826d2"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/schema.rs">
+        <art:range hash="sha256:1cbcdcd3ce6de44abf871fff464df3fe9f20d03abb5eb53c65dbda2f601983cb"
+                   start-line="97" end-line="176"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Content element discovery and collection from XSD appinfo
+    annotations for combined schema generation.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-validate">
+    <art:spec-ref node="validation-flow-step-validate"
+              revision="draft-1"
+              node-hash="sha256:8c83e368844d16cf28f563c211eaff5764e06e266cbe2331df3a9d7e0483e879"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="ae7434a"
+              path="crates/clayers-spec/src/validate.rs">
+        <art:range hash="sha256:768442d93bf910d39fb11bc3c8ba082eaaad77a6fb88ab8abd58f04b39dc0e29"
+                   start-line="59" end-line="117"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>validate command: schema validation + iter_errors loop.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-validation-flow-step-report">
+    <art:spec-ref node="validation-flow-step-report"
+              revision="draft-1"
+              node-hash="sha256:b6281d6d83d5655dfc87616029605156d05d0b3f48fbf5e8889fee3208dbc5b6"/>
+    <art:artifact repo="repo-clayers"
+              repo-revision="2916ded"
+              path="crates/clayers/src/cli.rs">
+        <art:range hash="sha256:358f425f4872ffb633c63525e003d8ef20f34579d0b039b6256c1c71a17f14cb"
+                   start-line="471" end-line="488"/>
+      </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>cmd_validate: per-spec pass/fail reporting.</art:note>
+  </art:mapping>
+
+  <!-- Refines relations: validation-flow steps -->
+
+  <rel:relation type="refines" from="validation-flow-step-discover" to="validation-flow">
+    <rel:note>Step: discover XML files from path.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-resolve-index" to="validation-flow">
+    <rel:note>Step: check if index or resolve index attribute.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-read-manifest" to="validation-flow">
+    <rel:note>Step: read file manifest from index.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-assemble" to="validation-flow">
+    <rel:note>Step: assemble combined document.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-generate-schema" to="validation-flow">
+    <rel:note>Step: generate combined schema.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-validate" to="validation-flow">
+    <rel:note>Step: validate combined document against schema.</rel:note>
+  </rel:relation>
+
+  <rel:relation type="refines" from="validation-flow-step-report" to="validation-flow">
+    <rel:note>Step: report validation results.</rel:note>
+  </rel:relation>
+
+  <!-- Machine descriptions -->
+
+  <llm:schema namespace="urn:clayers:combined">
+    The combined schema is not a layer file but a validation wrapper,
+    generated dynamically at validation time. The validator scans all
+    layer .xsd files for spec:content-element appinfo markers (to build
+    the choice group) and spec:keyref annotations (to emit keyref
+    constraints). It imports all layer schemas for structural validation
+    and defines xs:unique on all @id attributes plus xs:keyref for
+    every cross-layer reference type. No static combined.xsd file
+    exists: adding a new layer only requires the layer schema itself.
+  </llm:schema>
+
+  <llm:node ref="cross-layer-integrity">
+    Explains how cross-document references work despite XSD IDREF
+    being single-document scoped. The solution: assemble a combined
+    document and use xs:unique + xs:keyref. This is the most
+    technically subtle part of the design.
+  </llm:node>
+
+  <llm:node ref="validation-flow">
+    The step-by-step process the validator follows: discover XML files,
+    resolve indexes, unwrap children from each file's clayers root,
+    assemble combined document, generate the combined schema from layer
+    appinfo annotations, validate. This maps directly to the
+    clayers-cli implementation.
+  </llm:node>
+</spec:clayers>

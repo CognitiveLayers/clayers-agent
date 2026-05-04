@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+cd "$repo_root"
+
+mkdir -p .agents/plugins
+cp codex-marketplace.json .agents/plugins/marketplace.json
+printf 'synced codex-marketplace.json -> .agents/plugins/marketplace.json\n'

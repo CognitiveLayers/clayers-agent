@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+base_url="${CLAYERS_ORCHESTRATOR_URL:-${CLAYERS_API_URL:-http://127.0.0.1:8787}}"
+base_url="${base_url%/}"
+script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  clayers-orchestrator health [--host URL]
+  clayers-orchestrator submit [--host URL] [--path PATH | --repo-url URL] [--mode sync|review|adopt] [--stream]
+  clayers-orchestrator watch [--host URL] [--path PATH] [--mode sync|review|adopt] [--interval-ms N] [--debounce-ms N] [--no-initial] [--no-stream]
+  clayers-orchestrator status [--host URL] JOB_ID
+
+Environment:
+  CLAYERS_ORCHESTRATOR_URL  Base URL for the orchestration service
+  CLAYERS_API_URL           Fallback base URL
+  CLAYERS_ORCHESTRATOR_ROOT Path to the local orchestrator package
+USAGE
+}
+
+need() {
+  command -v "$1" >/dev/null 2>&1 || {
+    printf 'missing required command: %s\n' "$1" >&2
+    exit 1
+  }
+}
+
+json_payload() {
+  python3 - "$mode" "${path_arg:-}" "${repo_url:-}" <<'PY'
+import json
+import sys
+
+mode, path_arg, repo_url = sys.argv[1:4]
+payload = {"mode": mode}
+if repo_url:
+    payload["repoUrl"] = repo_url
+else:
+    payload["path"] = path_arg or "."
+print(json.dumps(payload))
+PY
+}
+
+extract_job_id() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+print(json.loads(sys.argv[1])["id"])
+PY
+}
+
+find_orchestrator_root() {
+  if [ -n "${CLAYERS_ORCHESTRATOR_ROOT:-}" ]; then
+    printf '%s\n' "$CLAYERS_ORCHESTRATOR_ROOT"
+    return 0
+  fi
+
+  search_dir="$script_dir"
+  while [ "$search_dir" != "/" ]; do
+    if [ -f "$search_dir/orchestrator/package.json" ] && [ -f "$search_dir/orchestrator/src/client.ts" ]; then
+      printf '%s\n' "$search_dir/orchestrator"
+      return 0
+    fi
+    search_dir="$(dirname "$search_dir")"
+  done
+
+  return 1
+}
+
+run_local_watcher() {
+  need node
+  need npm
+  orchestrator_root="$(find_orchestrator_root)" || {
+    printf 'local watcher requires the orchestrator package beside the plugin or CLAYERS_ORCHESTRATOR_ROOT to be set\n' >&2
+    exit 1
+  }
+
+  if [ ! -f "$orchestrator_root/dist/client.js" ]; then
+    (
+      cd "$orchestrator_root"
+      npm_config_cache="${npm_config_cache:-/tmp/clayers-npm-cache}" npm ci >/dev/null
+      npm run build >/dev/null
+    )
+  fi
+
+  exec node "$orchestrator_root/dist/client.js" watch --host "$base_url" "$@"
+}
+
+command="${1:-}"
+if [ -z "$command" ]; then
+  usage
+  exit 2
+fi
+shift
+
+case "$command" in
+  health)
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --host)
+          base_url="${2%/}"
+          shift 2
+          ;;
+        -h|--help)
+          usage
+          exit 0
+          ;;
+        *)
+          printf 'unexpected argument: %s\n' "$1" >&2
+          exit 2
+          ;;
+      esac
+    done
+    need curl
+    curl -fsS "$base_url/health"
+    printf '\n'
+    ;;
+  status)
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --host)
+          base_url="${2%/}"
+          shift 2
+          ;;
+        *)
+          job_id="$1"
+          shift
+          ;;
+      esac
+    done
+    : "${job_id:?status requires JOB_ID}"
+    need curl
+    curl -fsS "$base_url/v1/jobs/$job_id"
+    ;;
+  submit)
+    mode="sync"
+    stream=0
+    path_arg="."
+    repo_url=""
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --host)
+          base_url="${2%/}"
+          shift 2
+          ;;
+        --path)
+          path_arg="$2"
+          repo_url=""
+          shift 2
+          ;;
+        --repo-url)
+          repo_url="$2"
+          path_arg=""
+          shift 2
+          ;;
+        --mode)
+          mode="$2"
+          shift 2
+          ;;
+        --stream)
+          stream=1
+          shift
+          ;;
+        -h|--help)
+          usage
+          exit 0
+          ;;
+        *)
+          printf 'unexpected argument: %s\n' "$1" >&2
+          exit 2
+          ;;
+      esac
+    done
+
+    need curl
+    need python3
+    payload="$(json_payload)"
+    response="$(curl -fsS -X POST "$base_url/v1/jobs" -H 'Content-Type: application/json' --data "$payload")"
+    printf '%s\n' "$response"
+    if [ "$stream" -eq 1 ]; then
+      job_id="$(extract_job_id "$response")"
+      curl -fsS -N "$base_url/v1/jobs/$job_id/events"
+    fi
+    ;;
+  watch)
+    watch_args=()
+    while [ "$#" -gt 0 ]; do
+      case "$1" in
+        --host)
+          base_url="${2%/}"
+          shift 2
+          ;;
+        -h|--help)
+          usage
+          exit 0
+          ;;
+        *)
+          watch_args+=("$1")
+          shift
+          ;;
+      esac
+    done
+    run_local_watcher "${watch_args[@]}"
+    ;;
+  -h|--help)
+    usage
+    ;;
+  *)
+    printf 'unknown command: %s\n' "$command" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

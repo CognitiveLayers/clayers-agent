@@ -1,0 +1,21 @@
+.DS_Store
+
+# Local Codex app workspace state. The publishable Codex marketplace catalog is
+# codex-marketplace.json because this local .agents directory may be managed by
+# the Codex desktop app.
+.agents/
+
+# Local Claude Code workspace state created by local plugin installs.
+/.claude/
+
+# Local Clayers repository stores and generated docs.
+.clayers.db
+*.clayers.html
+
+# Build outputs.
+target/
+node_modules/
+dist/
+.wrangler/
+__pycache__/
+.pytest_cache/

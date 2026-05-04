@@ -1,0 +1,20 @@
+{
+  "name": "clayers-local",
+  "interface": {
+    "displayName": "Clayers Local Plugins"
+  },
+  "plugins": [
+    {
+      "name": "clayers",
+      "source": {
+        "source": "local",
+        "path": "./plugins/clayers"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Development"
+    }
+  ]
+}

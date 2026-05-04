@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+set -u
+
+ok_count=0
+warn_count=0
+fail_count=0
+
+ok() {
+  ok_count=$((ok_count + 1))
+  printf 'OK   %s\n' "$1"
+}
+
+warn() {
+  warn_count=$((warn_count + 1))
+  printf 'WARN %s\n' "$1"
+}
+
+fail() {
+  fail_count=$((fail_count + 1))
+  printf 'FAIL %s\n' "$1"
+}
+
+clayers_version() {
+  {
+    "$1" --version 2>/dev/null || "$1" -V 2>/dev/null || true
+  } | awk 'NR == 1 {print $2}'
+}
+
+describe_clayers() {
+  found="$(clayers_version "$1" || true)"
+  if [ -n "$found" ]; then
+    printf '%s\n' "$found"
+  else
+    printf 'unknown version\n'
+  fi
+}
+
+printf 'clayers preflight\n'
+printf '=================\n'
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -n "$repo_root" ]; then
+  cd "$repo_root" || exit 2
+  ok "git repo: $repo_root"
+else
+  repo_root="$(pwd)"
+  warn "not inside a git repo; using current directory: $repo_root"
+fi
+
+project_name="$(basename "$repo_root")"
+printf 'PROJECT %s\n' "$project_name"
+
+if command -v git >/dev/null 2>&1; then
+  ok "git is available: $(git --version)"
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    dirty="$(git status --short 2>/dev/null || true)"
+    if [ -n "$dirty" ]; then
+      warn "working tree has existing changes"
+      printf '%s\n' "$dirty" | sed 's/^/     /'
+    else
+      ok "working tree is clean"
+    fi
+  fi
+else
+  fail "git is not available on PATH"
+fi
+
+bootstrap_cmd=""
+if command -v clayers-bootstrap >/dev/null 2>&1; then
+  bootstrap_cmd="$(command -v clayers-bootstrap)"
+else
+  script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+  if [ -x "$script_dir/clayers-bootstrap" ]; then
+    bootstrap_cmd="$script_dir/clayers-bootstrap"
+  fi
+fi
+
+if [ -n "$bootstrap_cmd" ] && clayers_bin="$("$bootstrap_cmd" --check --print-bin 2>/dev/null)"; then
+  ok "core clayers is available through bootstrap: $(describe_clayers "$clayers_bin") ($clayers_bin)"
+elif command -v clayers >/dev/null 2>&1; then
+  clayers_bin="$(command -v clayers)"
+  ok "core clayers is available on PATH: $(describe_clayers "$clayers_bin") ($clayers_bin)"
+else
+  fail "core clayers is not installed yet"
+  if [ -n "$bootstrap_cmd" ]; then
+    warn "plugin can install pinned core Clayers with: clayers-bootstrap --install"
+  fi
+  if command -v cargo >/dev/null 2>&1; then
+    warn "cargo is available for plugin-managed install"
+  elif command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
+    warn "python is available for plugin-managed venv install"
+  else
+    warn "no Cargo or Python detected for automatic Clayers installation"
+  fi
+fi
+
+spec_dirs=()
+if [ -d clayers ]; then
+  while IFS= read -r index_file; do
+    spec_dirs+=("${index_file%/index.xml}")
+  done < <(find clayers -mindepth 2 -maxdepth 2 -type f -name index.xml 2>/dev/null | sort)
+fi
+
+if [ "${#spec_dirs[@]}" -eq 0 ]; then
+  warn "no Clayers spec found; expected after adoption: clayers/$project_name/index.xml"
+elif [ "${#spec_dirs[@]}" -eq 1 ]; then
+  ok "found Clayers spec: ${spec_dirs[0]}"
+else
+  warn "found multiple Clayers specs"
+  for dir in "${spec_dirs[@]}"; do
+    printf '     %s\n' "$dir"
+  done
+fi
+
+if [ -d .clayers/schemas ]; then
+  xsd_count="$(find .clayers/schemas -type f -name '*.xsd' 2>/dev/null | wc -l | tr -d ' ')"
+  ok ".clayers/schemas exists with $xsd_count XSD file(s)"
+else
+  warn ".clayers/schemas is missing; run clayers adopt ."
+fi
+
+if [ -f AGENTS.md ] || [ -f CLAUDE.md ]; then
+  ok "agent guidance file exists"
+else
+  warn "no AGENTS.md or CLAUDE.md found"
+fi
+
+printf '\nSUMMARY ok=%s warn=%s fail=%s\n' "$ok_count" "$warn_count" "$fail_count"
+
+if [ "$fail_count" -gt 0 ]; then
+  exit 1
+fi
+
+exit 0

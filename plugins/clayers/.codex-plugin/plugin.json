@@ -1,0 +1,44 @@
+{
+  "name": "clayers",
+  "version": "0.1.0",
+  "description": "Local-first Codex plugin for invoking Clayers-owned knowledge workflows.",
+  "author": {
+    "name": "Cognitive Layers",
+    "url": "https://github.com/CognitiveLayers"
+  },
+  "homepage": "https://github.com/CognitiveLayers/clayers",
+  "repository": "https://github.com/CognitiveLayers/clayers",
+  "license": "Apache-2.0",
+  "keywords": [
+    "clayers",
+    "knowledge-model",
+    "repository-analysis",
+    "specification",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Clayers",
+    "shortDescription": "Run Clayers-owned local workflows from a repo.",
+    "longDescription": "Clayers helps Codex bootstrap the local Clayers CLI, adopt a repository, request Clayers-owned sync/generation when available, and report spec health, drift, coverage, and connectivity from the local checkout.",
+    "developerName": "Cognitive Layers",
+    "category": "Development",
+    "capabilities": [
+      "Repository Status",
+      "Local Execution",
+      "Review"
+    ],
+    "websiteURL": "https://github.com/CognitiveLayers/clayers",
+    "privacyPolicyURL": "https://github.com/CognitiveLayers/clayers",
+    "termsOfServiceURL": "https://github.com/CognitiveLayers/clayers",
+    "defaultPrompt": [
+      "Ask Clayers to sync this repo.",
+      "Review my Clayers spec for drift.",
+      "Adopt this repo into Clayers."
+    ],
+    "brandColor": "#2A6F68",
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png"
+  }
+}

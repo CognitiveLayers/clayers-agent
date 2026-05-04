@@ -146,17 +146,26 @@ ok "Claude preflight runs"
 plugins/clayers/scripts/clayers-preflight >/dev/null
 ok "Codex preflight runs"
 
-(
-  cd clayers-core
-  ../claude-plugin/bin/clayers-quality-suite --no-fix clayers/clayers >/dev/null
-)
-ok "Claude quality suite passes against clayers-core"
+if [ -d clayers-core/.git ]; then
+  (
+    cd clayers-core
+    ../claude-plugin/bin/clayers-quality-suite --no-fix clayers/clayers >/dev/null
+  )
+  ok "Claude quality suite passes against clayers-core"
 
-(
-  cd clayers-core
-  ../plugins/clayers/scripts/clayers-quality-suite --no-fix clayers/clayers >/dev/null
-)
-ok "Codex quality suite passes against clayers-core"
+  (
+    cd clayers-core
+    ../plugins/clayers/scripts/clayers-quality-suite --no-fix clayers/clayers >/dev/null
+  )
+  ok "Codex quality suite passes against clayers-core"
+else
+  clayers_bin="$(command -v clayers || true)"
+  [ -n "$clayers_bin" ] || fail "clayers must be available for embedded clayers-core checks"
+  "$clayers_bin" validate clayers-core/clayers/clayers >/dev/null
+  "$clayers_bin" artifact --coverage clayers-core/clayers/clayers >/dev/null
+  "$clayers_bin" connectivity clayers-core/clayers/clayers >/dev/null
+  ok "embedded clayers-core structural checks pass; drift requires upstream git history"
+fi
 
 if [ -d .agents ] && rg -n "TODO|\\[TODO" .agents >/dev/null 2>&1; then
   printf 'WARN .agents contains local placeholder metadata; release uses codex-marketplace.json instead.\n'

@@ -3,6 +3,8 @@ set -euo pipefail
 
 fix=1
 spec_dir=""
+initial_cwd="$(pwd)"
+explicit_spec=0
 
 usage() {
   cat <<'USAGE'
@@ -32,15 +34,25 @@ while [ "$#" -gt 0 ]; do
         exit 2
       fi
       spec_dir="$1"
+      explicit_spec=1
       shift
       ;;
   esac
 done
 
-repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$repo_root"
-
 script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+if [ -n "$spec_dir" ]; then
+  case "$spec_dir" in
+    /*) ;;
+    *) spec_dir="$initial_cwd/$spec_dir" ;;
+  esac
+fi
+if [ "$explicit_spec" -eq 1 ] && [ "$(basename -- "$(dirname -- "$spec_dir")")" = "clayers" ]; then
+  repo_root="$(dirname -- "$(dirname -- "$spec_dir")")"
+else
+  repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+fi
+cd "$repo_root"
 
 resolve_clayers() {
   if [ -n "${CLAYERS_BIN:-}" ] && [ -x "$CLAYERS_BIN" ]; then

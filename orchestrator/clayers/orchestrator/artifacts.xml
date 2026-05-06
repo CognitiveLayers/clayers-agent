@@ -111,11 +111,11 @@
   <art:mapping id="map-file-src-model-generator-ts-d925604c">
     <art:spec-ref node="file-src-model-generator-ts-d925604c"
               revision="draft-1"
-              node-hash="sha256:0c0dc22d39730bb25ef28868b623dbc6d6172cc0f5b1ca74736c1eaf8228e679"/>
+              node-hash="sha256:f1f8e42ed75298bfb8469e19d35e28fcba02f60c90e7f9990aa2583dfd4c9cb7"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/model-generator.ts">
-      <art:range hash="sha256:5ba89018ac7b529b4d62c5e0ec319cac64d4f51571dcd2bdb6242e76f80dd9e3"/>
+      <art:range hash="sha256:a981bd5910376cf13d2fc11e730f3f83098c1c5a5ae9a444ec3fbe2491582ab7"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>

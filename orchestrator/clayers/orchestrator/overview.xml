@@ -3,13 +3,14 @@
 <spec:clayers xmlns:spec="urn:clayers:spec"
        xmlns:pr="urn:clayers:prose"
        xmlns:org="urn:clayers:organization"
-       xmlns:vcs="urn:clayers:vcs"
        xmlns:llm="urn:clayers:llm"
        spec:index="index.xml">
 
-  <vcs:git id="repo-orchestrator"
-           remote="file://local/orchestrator"
-           default-branch="local"/>
+  <pr:section id="repo-orchestrator">
+    <pr:title>orchestrator Repository</pr:title>
+    <pr:shortdesc>Repository identity used by generated artifact mappings.</pr:shortdesc>
+    <pr:p>Generated repository identity for artifact mappings. Remote: <pr:code>file://local/orchestrator</pr:code>.</pr:p>
+  </pr:section>
 
   <pr:section id="repo-overview">
     <pr:title>orchestrator Repository Model</pr:title>
@@ -84,7 +85,7 @@
             <pr:td><pr:code>src/model-generator.ts</pr:code></pr:td>
             <pr:td>source</pr:td>
             <pr:td>TypeScript</pr:td>
-            <pr:td>654</pr:td>
+            <pr:td>655</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>src/runner.ts</pr:code></pr:td>
@@ -258,7 +259,7 @@
     <pr:title>src/model-generator.ts</pr:title>
     <pr:shortdesc>source file using TypeScript.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>src/model-generator.ts</pr:code>.</pr:p>
-    <pr:p>Size: 20311 bytes. Lines: 654.</pr:p>
+    <pr:p>Size: 20467 bytes. Lines: 655.</pr:p>
   </pr:section>
 
   <pr:section id="file-src-runner-ts-d64beacb">
@@ -513,7 +514,7 @@
   <llm:node ref="file-src-client-ts-25d66d74">src/client.ts is a source file using TypeScript. It has 338 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-job-store-ts-2d3a25cb">src/job-store.ts is a source file using TypeScript. It has 117 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-local-query-ts-b9ff1430">src/local-query.ts is a source file using TypeScript. It has 160 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-src-model-generator-ts-d925604c">src/model-generator.ts is a source file using TypeScript. It has 654 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-src-model-generator-ts-d925604c">src/model-generator.ts is a source file using TypeScript. It has 655 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-runner-ts-d64beacb">src/runner.ts is a source file using TypeScript. It has 389 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-server-ts-8a8ae075">src/server.ts is a source file using TypeScript. It has 404 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-types-ts-c54113cf">src/types.ts is a source file using TypeScript. It has 56 lines and is tracked by an artifact mapping.</llm:node>

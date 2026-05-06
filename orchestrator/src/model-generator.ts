@@ -393,13 +393,14 @@ function renderOverview(
 <spec:clayers xmlns:spec="urn:clayers:spec"
        xmlns:pr="urn:clayers:prose"
        xmlns:org="urn:clayers:organization"
-       xmlns:vcs="urn:clayers:vcs"
        xmlns:llm="urn:clayers:llm"
        spec:index="index.xml">
 
-  <vcs:git id="repo-${xml(projectName)}"
-           remote="${xml(gitInfo.remote)}"
-           default-branch="${xml(gitInfo.branch)}"/>
+  <pr:section id="repo-${xml(projectName)}">
+    <pr:title>${xml(projectName)} Repository</pr:title>
+    <pr:shortdesc>Repository identity used by generated artifact mappings.</pr:shortdesc>
+    <pr:p>Generated repository identity for artifact mappings. Remote: <pr:code>${xml(gitInfo.remote)}</pr:code>.</pr:p>
+  </pr:section>
 
   <pr:section id="repo-overview">
     <pr:title>${xml(projectName)} Repository Model</pr:title>

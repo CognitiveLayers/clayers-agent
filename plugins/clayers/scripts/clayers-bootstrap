@@ -110,8 +110,7 @@ version_ok() {
   bin="$1"
   found="$(clayers_version "$bin" || true)"
   if [ -z "$found" ]; then
-    clayers_usable "$bin"
-    return $?
+    return 1
   fi
   case "$found" in
     "$wanted_version"|"$wanted_version"-*) return 0 ;;
@@ -205,7 +204,12 @@ install_managed() {
       install_with_python
       ;;
     auto)
-      install_with_cargo || install_with_python
+      if install_with_cargo && [ -x "$managed_bin" ] && version_ok "$managed_bin"; then
+        :
+      else
+        rm -rf "$install_root"
+        install_with_python
+      fi
       ;;
     *)
       log "unknown CLAYERS_INSTALL_METHOD: $method"

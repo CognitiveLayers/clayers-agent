@@ -7,7 +7,7 @@
   <art:mapping id="map-file-agents-md-a54ff182">
     <art:spec-ref node="file-agents-md-a54ff182"
               revision="draft-1"
-              node-hash="sha256:fae428ec08495cb98c6ac4ec03c47c34ebe37f900a197b0caddf9e762a4e8028"/>
+              node-hash="sha256:bfe7e213c232f2d88e826daf469d9e7b990ba393b39e1bd1252c54d34af07fed"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/AGENTS.md">
@@ -20,7 +20,7 @@
   <art:mapping id="map-file-cloudflare-package-json-745e05f7">
     <art:spec-ref node="file-cloudflare-package-json-745e05f7"
               revision="draft-1"
-              node-hash="sha256:cf559edd437d91384d97f1a85c8160c90140e47abe3276f47d2fe99d9e7a5d0c"/>
+              node-hash="sha256:e1c025e4216c73ef27458244137addaa3f00e22e1c48116d2e4e9bfd9eaeefd5"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/package.json">
@@ -33,7 +33,7 @@
   <art:mapping id="map-file-dockerfile-dd2c0eb6">
     <art:spec-ref node="file-dockerfile-dd2c0eb6"
               revision="draft-1"
-              node-hash="sha256:7a235dd551f086939d7b9df0981ad09b68cb29c1899e8e4ee244df68c5db30ce"/>
+              node-hash="sha256:ead945e454afa71b86abf85d6a9cbf9141eeddc42abccfeadc88888f956007cd"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/Dockerfile">
@@ -46,7 +46,7 @@
   <art:mapping id="map-file-package-json-7ae45ad1">
     <art:spec-ref node="file-package-json-7ae45ad1"
               revision="draft-1"
-              node-hash="sha256:74a0d71affa16a09c3e8e6775d97245458ad56d335126788cee3e72637ba9389"/>
+              node-hash="sha256:ba1542365af48799dd1e641dc15acb2d42002fd955e60e43933c889a5b1cf9dc"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/package.json">
@@ -59,7 +59,7 @@
   <art:mapping id="map-file-cloudflare-src-index-ts-97282eeb">
     <art:spec-ref node="file-cloudflare-src-index-ts-97282eeb"
               revision="draft-1"
-              node-hash="sha256:30be54aa8809ea684ca8cf41676298ff68f50b77586f2e34a3feb77919ef387c"/>
+              node-hash="sha256:34255b4394dfea918fde8fd6e1ddfcad82fd63374a9d86e5b889fcc324e006d0"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/src/index.ts">
@@ -72,7 +72,7 @@
   <art:mapping id="map-file-src-client-ts-25d66d74">
     <art:spec-ref node="file-src-client-ts-25d66d74"
               revision="draft-1"
-              node-hash="sha256:4a28a9b3da96e7bacca7af36e6a953b230c191a6baae1885dd27880b65aafd20"/>
+              node-hash="sha256:7ce15554dae2f4096c0132eb6dd2dfd666f328e04d48e6138182cfaaee7a75fa"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/client.ts">
@@ -85,7 +85,7 @@
   <art:mapping id="map-file-src-job-store-ts-2d3a25cb">
     <art:spec-ref node="file-src-job-store-ts-2d3a25cb"
               revision="draft-1"
-              node-hash="sha256:89d4713d4da60136abc81d50d70f58723b237a63aabdd6d06f7457f6cd0b3800"/>
+              node-hash="sha256:618c97054bfbc7f280b79e73a3a22d545f164af2e82753a658793479a56ba192"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/job-store.ts">
@@ -98,7 +98,7 @@
   <art:mapping id="map-file-src-local-query-ts-b9ff1430">
     <art:spec-ref node="file-src-local-query-ts-b9ff1430"
               revision="draft-1"
-              node-hash="sha256:d0dfa5bf9d9bcd451d913a0de16cd8cb157243c8c8789dac1de94727cd4ac6cd"/>
+              node-hash="sha256:14d82d12a90ba89dde2c0e56aae377a45aa948ce534954d1cac7c6771b4fe29f"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/local-query.ts">
@@ -111,7 +111,7 @@
   <art:mapping id="map-file-src-model-generator-ts-d925604c">
     <art:spec-ref node="file-src-model-generator-ts-d925604c"
               revision="draft-1"
-              node-hash="sha256:f1f8e42ed75298bfb8469e19d35e28fcba02f60c90e7f9990aa2583dfd4c9cb7"/>
+              node-hash="sha256:d6f484b4fcb697ff8f02eec0d06168bc74683e0975aa953c5289fbcebecf938b"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/model-generator.ts">
@@ -124,7 +124,7 @@
   <art:mapping id="map-file-src-runner-ts-d64beacb">
     <art:spec-ref node="file-src-runner-ts-d64beacb"
               revision="draft-1"
-              node-hash="sha256:463ccd69d9fadf4c062e57a50b9f169dadee50ff90e5c272cd4a70bfbdb78dfd"/>
+              node-hash="sha256:7f41f21222a450b04f9e8a3e7cfdd0b5d86a6d9ccb16b26d9f5d142f883a3d24"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/runner.ts">
@@ -137,7 +137,7 @@
   <art:mapping id="map-file-src-server-ts-8a8ae075">
     <art:spec-ref node="file-src-server-ts-8a8ae075"
               revision="draft-1"
-              node-hash="sha256:f7d99fe28929f3a2152c95dea43d31d6fbeb1c22654e0b43541491c53a6fb0cb"/>
+              node-hash="sha256:45b722eec00259e8f630e7008835d2d33c3a364674031c558291ec303c7c35cc"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/server.ts">
@@ -150,7 +150,7 @@
   <art:mapping id="map-file-src-types-ts-c54113cf">
     <art:spec-ref node="file-src-types-ts-c54113cf"
               revision="draft-1"
-              node-hash="sha256:9301beb91f1e9494e79d42f1c5bfe5292d99152bfa11bb5d5e0b2eee2bd71f6f"/>
+              node-hash="sha256:35251943598a29b03aa35a2fccf855e76e89af0c836e98fe776c529d0b780fe7"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/types.ts">
@@ -163,7 +163,7 @@
   <art:mapping id="map-file-src-watcher-ts-2207093b">
     <art:spec-ref node="file-src-watcher-ts-2207093b"
               revision="draft-1"
-              node-hash="sha256:e75e2583f35f046a71b250bfb9f3dcc2685bc397abd9d0a0c65fe72c94d88fe1"/>
+              node-hash="sha256:3ef3738d0aa3620a9ff52ec6b5c8312671d167c32e511aabd9794b296b7e7f0e"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/watcher.ts">
@@ -176,7 +176,7 @@
   <art:mapping id="map-file-cloudflare-readme-md-9035d38d">
     <art:spec-ref node="file-cloudflare-readme-md-9035d38d"
               revision="draft-1"
-              node-hash="sha256:d2f656a37ea16afce3d28ba9b6482fd80c2a54970b0caa5f21958d43cb5c2393"/>
+              node-hash="sha256:c5e2f2ab18febc07e02767a6ac791d04cb713f532c1afd2b617e396ef6beaeb8"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/README.md">
@@ -189,7 +189,7 @@
   <art:mapping id="map-file-readme-md-b3356305">
     <art:spec-ref node="file-readme-md-b3356305"
               revision="draft-1"
-              node-hash="sha256:77fa43ff3e22ba0dc38762ffd469206b6ff73c8744980eb1a472caa397b47ac8"/>
+              node-hash="sha256:472bf872c6fa460eab78c8545b5133948513143d5c2b3fd10c369b443e6984f6"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/README.md">
@@ -202,7 +202,7 @@
   <art:mapping id="map-file-dockerignore-2f754321">
     <art:spec-ref node="file-dockerignore-2f754321"
               revision="draft-1"
-              node-hash="sha256:8375f34f0bf562a807b0198ba6c4e0641c2f11a0517995100ceb258adf845978"/>
+              node-hash="sha256:61ccd267f017462e69f7f1f9ea69c6a4ba40b28866c77d3278d58c6b09666a8b"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/.dockerignore">
@@ -215,7 +215,7 @@
   <art:mapping id="map-file-bin-clayers-orchestrator-27a6cfdc">
     <art:spec-ref node="file-bin-clayers-orchestrator-27a6cfdc"
               revision="draft-1"
-              node-hash="sha256:48cd752deb49ff2d529005fdfb6f40d3c2f8efa50ec1e3d199b8081de91bfbeb"/>
+              node-hash="sha256:e565a6cffdfb62c44bbdbd57a2ba8047fc50ba8bdd6ea160cb43593f13f8e636"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/bin/clayers-orchestrator">
@@ -228,7 +228,7 @@
   <art:mapping id="map-file-cloudflare-package-lock-json-0e074670">
     <art:spec-ref node="file-cloudflare-package-lock-json-0e074670"
               revision="draft-1"
-              node-hash="sha256:114b48c2b4699e1723114a9c5e50cbe446e7dc8473cde7e991631174d03d9b45"/>
+              node-hash="sha256:b0f30544b849c9ff178e386c170b0ac45a20b63659c7870d2c596e2e42aec886"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/package-lock.json">
@@ -241,7 +241,7 @@
   <art:mapping id="map-file-cloudflare-scripts-check-9b6f79e5">
     <art:spec-ref node="file-cloudflare-scripts-check-9b6f79e5"
               revision="draft-1"
-              node-hash="sha256:3fd1ffe2d6623f18ba2ba6d1f8974435da4369703ad8dcf8e7681cdcb3625446"/>
+              node-hash="sha256:ca48f4b145f4cd61a0650671426f6a0a3d14fa11c6159f376daf7fcdc355783c"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/scripts/check">
@@ -254,7 +254,7 @@
   <art:mapping id="map-file-cloudflare-tsconfig-json-7e4891fd">
     <art:spec-ref node="file-cloudflare-tsconfig-json-7e4891fd"
               revision="draft-1"
-              node-hash="sha256:f44f828c6268629272bf68e0d57656ac3fe8e9462722d4cbc326e47774a1d624"/>
+              node-hash="sha256:223adf9b9bb3e78491a33aab329641ee533a977a19a3c0b337d21e543c8bbdd2"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/tsconfig.json">
@@ -267,7 +267,7 @@
   <art:mapping id="map-file-cloudflare-wrangler-json-f7e61e5d">
     <art:spec-ref node="file-cloudflare-wrangler-json-f7e61e5d"
               revision="draft-1"
-              node-hash="sha256:019acc64be18bf1997ee6258e1a3ba20ec206ef509eaf9980efe76381aaeddd4"/>
+              node-hash="sha256:5a5b064307b4eff8272a0371ada0deb38a87147888e286f66e987f1ce8379ecc"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/cloudflare/wrangler.json">
@@ -280,7 +280,7 @@
   <art:mapping id="map-file-package-lock-json-053150b6">
     <art:spec-ref node="file-package-lock-json-053150b6"
               revision="draft-1"
-              node-hash="sha256:997eba775a6be694234eea24f33d9597f8309c154a32a56a2bf486401f8580e8"/>
+              node-hash="sha256:c10c2e69a0b48561c365ea3b9cb6c91ec1537077308f728da1e391aa5d76040d"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/package-lock.json">
@@ -293,7 +293,7 @@
   <art:mapping id="map-file-scripts-check-90934217">
     <art:spec-ref node="file-scripts-check-90934217"
               revision="draft-1"
-              node-hash="sha256:069699b2b6c25ebece57c9c37bedb09d88b49e5320420c2143bd7be91c60349e"/>
+              node-hash="sha256:9e1efcac883ff7d7aa7bdad3345968fb363df7dbccacc6cd607a52ec177f1f78"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/scripts/check">
@@ -306,7 +306,7 @@
   <art:mapping id="map-file-scripts-clayers-check-095779f4">
     <art:spec-ref node="file-scripts-clayers-check-095779f4"
               revision="draft-1"
-              node-hash="sha256:1cda164105247bdb41e9cb56685c74785f7c10adfef3fc117c94715a1d85edee"/>
+              node-hash="sha256:afed2cc4e0ea4bf365374ce756e348e0098907fc112cffd98c41d790b47a7bc8"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/scripts/clayers-check">
@@ -319,7 +319,7 @@
   <art:mapping id="map-file-scripts-self-sync-53444097">
     <art:spec-ref node="file-scripts-self-sync-53444097"
               revision="draft-1"
-              node-hash="sha256:b0a3480aa5d175bc95a9d9abc5985aef172da019a60ab3dc45d65fe6e9e763f5"/>
+              node-hash="sha256:6ab4f027fac9433bcf5156901864a2e8d9d823fd3812d86fb916e2b52b1ce3e3"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/scripts/self-sync">
@@ -332,7 +332,7 @@
   <art:mapping id="map-file-scripts-smoke-0719e516">
     <art:spec-ref node="file-scripts-smoke-0719e516"
               revision="draft-1"
-              node-hash="sha256:db19c9db8f2067e22253b47aa5c60a3a3a7e7ebba6b9b2ed20627148d187df5a"/>
+              node-hash="sha256:41e15e9cb5049453e9f0b9c664a7449876143dce374918488a2d4a07218db740"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/scripts/smoke">
@@ -345,7 +345,7 @@
   <art:mapping id="map-file-tsconfig-json-b55cdbef">
     <art:spec-ref node="file-tsconfig-json-b55cdbef"
               revision="draft-1"
-              node-hash="sha256:eecd265d69fe9658b40b4c1d7cb9829bb5987d8a4a65f8c9add8ec77976474e4"/>
+              node-hash="sha256:3a1c581f26e6da11a73be895d982b59b8caad4311697e7a0b973600ec8db1c9f"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/tsconfig.json">

@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import type { Readable } from "node:stream";
 import type { JobStore } from "./job-store.js";
 import type { Job, StepOptions, StepResult } from "./types.js";
+import { generateRepositoryModel, writeFallbackDocs } from "./model-generator.js";
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(moduleDir, "../..");
@@ -56,7 +57,15 @@ export async function runClayersJob(store: JobStore, job: Job): Promise<void> {
       } else {
         store.addEvent(job.id, "core.capability.missing", {
           command: "sync",
-          message: "Installed Clayers core does not expose autonomous sync yet."
+          message: "Installed Clayers core does not expose autonomous sync yet; using deterministic Clayers Agent generator."
+        });
+        const generated = await generateRepositoryModel(repoPath);
+        store.addEvent(job.id, "clayers.generate.local", {
+          specDir: generated.specDir,
+          projectName: generated.projectName,
+          filesModeled: generated.filesModeled,
+          filesOmitted: generated.filesOmitted,
+          filesWritten: generated.filesWritten.map((file) => path.relative(repoPath, file))
         });
       }
     }
@@ -68,6 +77,9 @@ export async function runClayersJob(store: JobStore, job: Job): Promise<void> {
       });
     } else {
       store.addEvent(job.id, "spec.detected", { specDir });
+      if (job.input.mode === "sync") {
+        await refreshGeneratedArtifacts(store, job, clayersBin, repoPath, specDir);
+      }
       await runQualitySuite(store, job, clayersBin, repoPath, specDir);
     }
 
@@ -79,6 +91,61 @@ export async function runClayersJob(store: JobStore, job: Job): Promise<void> {
     });
     store.setStatus(job.id, "failed");
   }
+}
+
+async function refreshGeneratedArtifacts(
+  store: JobStore,
+  job: Job,
+  clayersBin: string,
+  repoPath: string,
+  specDir: string
+): Promise<void> {
+  const relativeSpecDir = path.relative(repoPath, specDir) || specDir;
+  await runStep(store, job, {
+    name: "clayers.fix-node-hash",
+    command: clayersBin,
+    args: ["artifact", "--fix-node-hash", relativeSpecDir],
+    cwd: repoPath
+  });
+  await runStep(store, job, {
+    name: "clayers.fix-artifact-hash",
+    command: clayersBin,
+    args: ["artifact", "--fix-artifact-hash", relativeSpecDir],
+    cwd: repoPath
+  });
+
+  const projectName = path.basename(specDir);
+  const docsPath = path.join(relativeSpecDir, `${projectName}.clayers.html`);
+  const docsResult = await runStep(store, job, {
+    name: "clayers.docs",
+    command: clayersBin,
+    args: ["doc", "--self-contained", "-o", docsPath, relativeSpecDir],
+    cwd: repoPath,
+    allowNonZero: true,
+    markIssueOnNonZero: false
+  });
+  const docsAbsolutePath = path.join(repoPath, docsPath);
+
+  if (docsResult.code !== 0 || !(await pathExists(docsAbsolutePath))) {
+    await writeFallbackDocs(specDir, docsAbsolutePath);
+    store.addEvent(job.id, "clayers.docs.fallback", {
+      path: docsPath,
+      reason: docsResult.code !== 0 ? "core doc renderer failed" : "core doc renderer did not write output"
+    });
+  }
+
+  store.addEvent(job.id, "clayers.docs.generated", {
+    path: docsPath
+  });
+
+  await runStep(store, job, {
+    name: "clayers.query-summary",
+    command: clayersBin,
+    args: ["query", "--count", "//*[@id]", relativeSpecDir],
+    cwd: repoPath,
+    allowNonZero: true
+  });
+
 }
 
 async function prepareRepository(store: JobStore, job: Job): Promise<string> {
@@ -116,7 +183,7 @@ async function prepareRepository(store: JobStore, job: Job): Promise<string> {
   return repoPath;
 }
 
-async function resolveClayersBin(store: JobStore, job: Job): Promise<string> {
+export async function resolveClayersBin(store: JobStore, job: Job): Promise<string> {
   if (process.env.CLAYERS_BIN) {
     return process.env.CLAYERS_BIN;
   }
@@ -224,8 +291,17 @@ async function fileIsExecutable(filePath: string): Promise<boolean> {
   }
 }
 
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath, fsConstants.R_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function runStep(store: JobStore, job: Job, options: StepOptions): Promise<StepResult> {
-  const { name, command, args, cwd, allowNonZero = false } = options;
+  const { name, command, args, cwd, allowNonZero = false, markIssueOnNonZero = true } = options;
   const startedAt = Date.now();
 
   store.addEvent(job.id, "step.started", {
@@ -267,7 +343,7 @@ function runStep(store: JobStore, job: Job, options: StepOptions): Promise<StepR
       });
 
       if (code === 0 || allowNonZero) {
-        if (code !== 0) store.markIssue(job.id);
+        if (code !== 0 && markIssueOnNonZero) store.markIssue(job.id);
         resolve({ code, signal });
       } else {
         reject(new Error(`${name} failed with exit code ${code}`));

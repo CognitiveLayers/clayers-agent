@@ -3,6 +3,6 @@ set -euo pipefail
 
 orchestrator_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 repo_root="$(CDPATH= cd -- "$orchestrator_root/.." && pwd)"
-spec_dir="$orchestrator_root/clayers/orchestrator"
 
-"$repo_root/claude-plugin/bin/clayers-quality-suite" --no-fix "$spec_dir"
+cd "$orchestrator_root"
+"$repo_root/claude-plugin/bin/clayers-quality-suite" --no-fix clayers/orchestrator

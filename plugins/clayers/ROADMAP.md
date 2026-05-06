@@ -3,17 +3,17 @@
 ## v0.1 Local Skills
 
 - Adopt a local repository into Clayers.
-- Request Clayers-owned sync/generation from repo context when the installed core or hosted service exposes it.
+- Request Clayers-owned sync/generation through the local Orchestrator.
 - Review validation, drift, coverage, connectivity, and mapping status.
 - Bootstrap the pinned core Clayers CLI without asking users to clone Clayers manually.
-- Run `clayers-orchestrator watch` for debounced local filesystem-triggered Clayers jobs.
+- Run `clayers-orchestrator watch` for debounced local filesystem-triggered sync jobs.
 
 ## v0.2 Local Watcher
 
 - Implemented in the shared TypeScript orchestrator.
-- Tracks local file changes and submits debounced jobs to the local Orchestrator.
+- Tracks local file changes and submits debounced sync jobs to the local Orchestrator.
 - Keeps watcher status as process-local state only, not a new authoritative state store.
-- Does not silently rewrite specs in the plugin background.
+- Refreshes generated outputs through Orchestrator sync and refreshes the watcher baseline after each run.
 
 ## v0.3 Plugin Hooks
 

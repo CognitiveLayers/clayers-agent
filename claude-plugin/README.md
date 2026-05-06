@@ -8,7 +8,7 @@ This plugin gives Claude Code a namespaced Clayers workflow:
 - `/clayers:adopt` - bootstrap Clayers in the current repo without doing a full generation pass.
 - `/clayers:review` - report Clayers validation, drift, coverage, connectivity, and mapping status.
 
-The first release is intentionally local-first. It works in the user's checkout and leaves normal Clayers files in the repo so changes are inspectable, diffable, and commit-friendly. The plugin does not author Clayers XML itself.
+The first release is intentionally local-first. It works in the user's checkout and leaves normal Clayers files in the repo so changes are inspectable, diffable, and commit-friendly. The plugin does not author Clayers XML inside Claude; generation runs through Clayers core or the Clayers Agent Orchestrator.
 
 ## Install For Development
 
@@ -59,11 +59,13 @@ Resolution order is `CLAYERS_BIN`, then the plugin-managed install, then `clayer
 
 The helper script `bin/clayers-preflight` checks the local environment without modifying files. When the plugin is enabled, Claude Code adds plugin `bin/` executables to the Bash tool's `PATH`, so skills can call `clayers-bootstrap`, `clayers-preflight`, and `clayers-quality-suite` directly.
 
-For continuous local status, run the Orchestrator watcher from a release checkout with the orchestrator service running:
+For continuous local status, run the Orchestrator watcher from a release checkout:
 
 ```bash
 clayers-orchestrator watch --path /path/to/repo --mode sync
 ```
+
+If no `CLAYERS_ORCHESTRATOR_URL` or `CLAYERS_API_URL` is configured and no local service is already reachable, the helper starts a temporary local Orchestrator from the release checkout.
 
 ## Product Boundary
 

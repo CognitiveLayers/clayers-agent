@@ -2,7 +2,7 @@
 
 Local-first agent plugins for invoking Clayers-owned repository knowledge workflows.
 
-This repository packages Clayers for agent interfaces without requiring users to clone and build Clayers manually. The plugins bootstrap the pinned core Clayers CLI, run local preflight checks, adopt repositories, request Clayers-owned sync/generation when the installed core or hosted service exposes it, and report validation, drift, coverage, and connectivity.
+This repository packages Clayers for agent interfaces without requiring users to clone and build Clayers manually. The plugins bootstrap the pinned core Clayers CLI, run local preflight checks, adopt repositories, invoke the Clayers Agent Orchestrator for sync/generation, and report docs, query, validation, drift, coverage, and connectivity.
 
 ## Layout
 
@@ -30,7 +30,7 @@ scripts/build-release-repo /tmp/clayers-plugins-release
 
 Current target: `v0.1.0`.
 
-The plugins are local-first and do not require hosted Clayers APIs. They do not reimplement Clayers generation logic. The orchestrator provides on-demand Clayers jobs, realtime event streams, and a local background watcher that reruns Clayers jobs after debounced filesystem changes. It can run locally or as a Cloudflare Worker plus Cloudflare Container for remote repo jobs. Plugin hooks and MCP servers remain roadmap items.
+The plugins are local-first and do not require hosted Clayers APIs. The orchestrator provides on-demand Clayers jobs, a deterministic local model generator when core `sync` is not available, generated docs, query/review APIs, realtime event streams, and a local background watcher that reruns Clayers jobs after debounced filesystem changes. It can run locally or as a Cloudflare Worker plus Cloudflare Container for remote repo jobs. Plugin hooks and MCP servers remain roadmap items.
 
 ## Quick Install
 

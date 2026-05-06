@@ -7,11 +7,11 @@ description: Ask Clayers to sync or generate a knowledge model for the current l
 
 Ask Clayers to turn the current checkout into a Clayers-backed knowledge model.
 
-This skill is only an interface to Clayers. Codex must not author the knowledge model, rewrite Clayers XML, invent mappings, or resolve semantic drift itself. If the installed Clayers core or configured hosted Clayers service does not expose autonomous sync/generation, report that clearly instead of substituting Codex-authored specs.
+This skill is only an interface to Clayers. Codex must not author the knowledge model, rewrite Clayers XML, invent mappings, or resolve semantic drift itself. Use Clayers core or the Clayers Orchestrator for generation; if the Orchestrator reports a deterministic local generation fallback, report it as Clayers Agent output rather than Codex-authored XML.
 
 ## Principles
 
-- Clayers owns generation, sync, drift interpretation, mappings, relations, and spec edits.
+- Clayers core and Clayers Agent Orchestrator own generation, sync, drift interpretation, mappings, relations, and spec edits.
 - Codex owns orchestration: preflight, bootstrap, command invocation, and reporting.
 - Treat Clayers files as source. Do not overwrite or manually patch them unless a Clayers command produced the change.
 - Do not claim generation or sync happened unless Clayers core or hosted orchestration actually performed it.
@@ -48,9 +48,9 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
    clayers adopt .
    ```
 
-5. Request Clayers-owned sync/generation.
+5. Request Clayers-owned sync/generation through the Orchestrator first.
 
-   If hosted orchestration is requested, or `CLAYERS_ORCHESTRATOR_URL`/`CLAYERS_API_URL` is configured, submit the current repo to the Clayers orchestrator and stream job events:
+   Submit the current repo to the Clayers Orchestrator and stream job events:
 
    ```bash
    clayers-orchestrator submit --path . --mode sync --stream
@@ -58,7 +58,9 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
 
    If `clayers-orchestrator` is not on `PATH`, run `scripts/clayers-orchestrator submit --path . --mode sync --stream` from this plugin.
 
-   For local execution without an orchestrator, first check whether the installed core exposes a sync command:
+   The helper talks to `CLAYERS_ORCHESTRATOR_URL` or `CLAYERS_API_URL` when configured. Otherwise it can run the local TypeScript Orchestrator from the release checkout. The Orchestrator adopts the repo, asks core Clayers for `sync` when available, falls back to deterministic local model generation when core `sync` is unavailable, refreshes hashes through Clayers core, generates docs, runs query, and runs review checks.
+
+6. For emergency local execution without an Orchestrator package, check whether the installed core exposes a sync command:
 
    ```bash
    clayers sync --help
@@ -72,7 +74,7 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
 
    Only use hosted orchestration when the configured service exposes the documented `/v1/jobs` and `/v1/jobs/{job_id}/events` contract. Do not invent a different API contract inside the skill.
 
-6. If autonomous sync/generation is not available, stop at the Clayers boundary.
+7. If neither the Orchestrator nor core sync is available, stop at the Clayers boundary.
 
    Run read-only quality checks when a spec already exists:
 
@@ -80,9 +82,9 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
    clayers-quality-suite --no-fix clayers/<project>/
    ```
 
-   Then report that the installed Clayers core does not currently expose autonomous local sync/generation through this plugin. Do not build a repo model or write XML manually.
+   Then report that sync/generation could not run because neither the Orchestrator nor core sync is available. Do not build a repo model or write XML manually.
 
-7. If Clayers changed or created a spec, validate it:
+8. If Clayers changed or created a spec, validate it:
 
    ```bash
    clayers-quality-suite clayers/<project>/
@@ -90,13 +92,13 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
 
    If `clayers-quality-suite` is not on `PATH`, run `scripts/clayers-quality-suite` from this plugin.
 
-8. Generate docs only when validation passes and only through Clayers:
+9. Generate docs only when validation passes and only through Clayers or Orchestrator output:
 
    ```bash
    clayers doc clayers/<project>/
    ```
 
-9. Finish with:
+10. Finish with:
 
    - Spec directory.
    - Clayers command used.
@@ -106,6 +108,7 @@ This skill is only an interface to Clayers. Codex must not author the knowledge 
    - Coverage summary.
    - Connectivity summary.
    - Whether autonomous sync/generation was available.
+   - Whether the Orchestrator used core sync or deterministic local generation.
    - Whether changes are ready to commit.
 
 ## Modes

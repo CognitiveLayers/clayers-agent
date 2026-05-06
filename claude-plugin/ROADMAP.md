@@ -4,21 +4,20 @@
 
 Goal: make Clayers feel like one Claude Code command in an existing checkout.
 
-- Add installable Claude Code plugin manifest.
-- Add `/clayers:generate`, `/clayers:adopt`, and `/clayers:review` skills.
-- Add local preflight helper.
-- Keep all Clayers-generated XML in the repo for review and version control.
-- Do not author knowledge models inside Claude; invoke Clayers-owned local or hosted capabilities.
+- Installable Claude Code plugin manifest.
+- `/clayers:generate`, `/clayers:adopt`, and `/clayers:review` skills.
+- Local preflight helper.
+- Clayers-generated XML kept in the repo for review and version control.
+- Claude does not author knowledge models; it invokes Clayers core or Clayers Agent Orchestrator.
 
 ## Phase 2: Local Watcher
 
 Goal: provide near-realtime local status without involving a hosted service.
 
-- Add `clayers-orchestrator watch` for debounced filesystem-triggered jobs.
-- Reuse Clayers core state and safety primitives: `.clayers.db`, artifact hashes, read-only drift detection, validation, coverage, and connectivity.
-- Keep watcher status as process-local state only, not a new authoritative state store.
-- Report drift and Clayers sync status; do not silently rewrite specs in the plugin background.
-- Optionally regenerate docs when specs change.
+- `clayers-orchestrator watch` for debounced filesystem-triggered sync jobs.
+- Clayers core state and safety primitives: `.clayers.db`, artifact hashes, drift detection, validation, coverage, connectivity, query, and docs.
+- Watcher status remains process-local state only, not a new authoritative state store.
+- Generated outputs refresh through orchestrator sync and the watcher baseline is refreshed after each run.
 
 Implemented files:
 

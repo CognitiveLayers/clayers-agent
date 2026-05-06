@@ -15,6 +15,7 @@ need git
 need node
 need curl
 need rg
+need python3
 
 cd "$orchestrator_root"
 if [ ! -x node_modules/.bin/tsc ]; then
@@ -70,13 +71,42 @@ node "$orchestrator_root/dist/client.js" submit \
 
 rg -q "job.completed|job.completed_with_issues" "$client_log"
 rg -q "clayers.adopt" "$client_log"
+rg -q "clayers.generate.local" "$client_log"
+rg -q "clayers.docs.generated" "$client_log"
 rg -q "clayers.validate" "$client_log"
+test -f "$repo/clayers/repo/repo.clayers.html"
+
+job_id="$(python3 - "$client_log" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+match = re.search(r'"id":\s*"(job_[^"]+)"', Path(sys.argv[1]).read_text())
+if not match:
+    raise SystemExit("job id not found in client log")
+print(match.group(1))
+PY
+)"
+
+curl -fsS "http://127.0.0.1:$port/v1/jobs/$job_id/docs" >"$tmp/job-docs.html"
+rg -q "Clayers" "$tmp/job-docs.html"
+
+query_log="$tmp/query.json"
+curl -fsS \
+  -H "Content-Type: application/json" \
+  --data '{"query":"//*[@id]","count":true}' \
+  "http://127.0.0.1:$port/v1/jobs/$job_id/query" >"$query_log"
+rg -q '"code": 0' "$query_log"
+
+review_log="$tmp/review.json"
+curl -fsS "http://127.0.0.1:$port/v1/jobs/$job_id/review" >"$review_log"
+rg -q '"name": "clayers.validate"' "$review_log"
 
 watch_log="$tmp/watch.log"
 node "$orchestrator_root/dist/client.js" watch \
   --host "http://127.0.0.1:$port" \
   --path "$repo" \
-  --mode review \
+  --mode sync \
   --no-initial \
   --once \
   --interval-ms 100 \
@@ -100,7 +130,8 @@ printf '\nWatcher smoke change.\n' >> "$repo/README.md"
 wait "$watch_pid"
 watch_pid=""
 
-rg -q "\\[watch\\] submitting review job" "$watch_log"
+rg -q "\\[watch\\] submitting sync job" "$watch_log"
+rg -q "clayers.generate.local" "$watch_log"
 rg -q "job.completed|job.completed_with_issues" "$watch_log"
 
 claude_helper="$repo_root/claude-plugin/bin/clayers-orchestrator"
@@ -125,6 +156,25 @@ if [ -x "$codex_helper" ]; then
     --mode review \
     --stream >"$codex_helper_log"
   rg -q "job.completed|job.completed_with_issues" "$codex_helper_log"
+fi
+
+if [ -x "$claude_helper" ]; then
+  auto_repo="$tmp/auto-repo"
+  mkdir -p "$auto_repo"
+  (
+    cd "$auto_repo"
+    git init -q
+    printf '# Auto Helper Repo\n\nChecks plugin helper local orchestration startup.\n' > README.md
+  )
+  auto_helper_log="$tmp/auto-helper.log"
+  CLAYERS_ORCHESTRATOR_ROOT="$orchestrator_root" \
+    "$claude_helper" submit \
+      --path "$auto_repo" \
+      --mode sync \
+      --stream >"$auto_helper_log" 2>&1
+  rg -q "clayers.generate.local" "$auto_helper_log"
+  rg -q "clayers.docs.generated" "$auto_helper_log"
+  test -f "$auto_repo/clayers/auto-repo/auto-repo.clayers.html"
 fi
 
 printf 'OK   orchestrator smoke test\n'

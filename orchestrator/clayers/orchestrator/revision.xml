@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Revision Layer: Named snapshots of the orchestrator specification.
--->
+<!-- Generated revision anchor for the repository model. -->
 <spec:clayers xmlns:spec="urn:clayers:spec"
            xmlns="urn:clayers:revision"
            spec:spec="orchestrator">
 
   <revision name="draft-1"
-            timestamp="2026-05-04T17:46:40Z"
+            timestamp="2026-05-06T22:40:35.532Z"
             index="index.xml"
-            index-hash="sha256:3e01870deb9a4c56f4163c84a3d4e4499b4af5861932236d93e91846afc9d030">
-    <note>Initial specification.</note>
+            index-hash="sha256:d8e86b7bf52d98f0768f71b50729318b9ec42340a9830a96b3085262e407905e">
+    <note>Generated repository model snapshot.</note>
   </revision>
 </spec:clayers>

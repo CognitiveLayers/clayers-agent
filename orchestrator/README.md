@@ -1,8 +1,8 @@
 # Clayers Orchestrator
 
-TypeScript orchestration service for Clayers jobs with realtime event streams and local background watching.
+TypeScript orchestration service for Clayers jobs with realtime event streams, local background watching, generated docs, query, and review summaries.
 
-The orchestrator does not generate or edit the knowledge model itself. It accepts a local path or repo URL, prepares a worktree, invokes Clayers core commands, and streams job events so a UI, plugin, or development console can watch progress in real time. The local watcher observes filesystem changes and submits debounced jobs back to the Orchestrator.
+The orchestrator accepts a local path or repo URL, prepares a worktree, invokes Clayers core commands, and streams job events so a UI, plugin, or development console can watch progress in real time. When the installed Clayers core does not expose autonomous `sync` yet, the orchestrator creates a deterministic local Clayers model from repository structure and lets Clayers core maintain hashes, validation, drift, coverage, connectivity, query, and docs. The local watcher observes filesystem changes and submits debounced sync jobs back to the Orchestrator.
 
 ## Run Locally
 
@@ -56,6 +56,9 @@ GET  /v1/jobs
 POST /v1/jobs
 GET  /v1/jobs/{job_id}
 GET  /v1/jobs/{job_id}/events
+GET  /v1/jobs/{job_id}/docs
+POST /v1/jobs/{job_id}/query
+GET  /v1/jobs/{job_id}/review
 ```
 
 Create a job:
@@ -80,12 +83,33 @@ Modes:
 
 - `adopt` runs `clayers adopt .`
 - `review` runs Clayers validation, drift, coverage, and connectivity when a spec exists
-- `sync` runs adoption, then `clayers sync .` if the installed core exposes it, then quality checks
+- `sync` runs adoption, then `clayers sync .` if the installed core exposes it. If not, it writes a deterministic repository model, refreshes hashes through Clayers core, generates docs, runs a query summary, and runs quality checks.
 
 Realtime events use Server-Sent Events:
 
 ```bash
 curl -N http://127.0.0.1:8787/v1/jobs/job_123/events
+```
+
+Fetch generated docs:
+
+```bash
+curl http://127.0.0.1:8787/v1/jobs/job_123/docs
+```
+
+Run a Clayers query against the generated spec:
+
+```bash
+curl \
+  -H "Content-Type: application/json" \
+  --data '{"query":"//*[@id]","count":true}' \
+  http://127.0.0.1:8787/v1/jobs/job_123/query
+```
+
+Fetch the review summary:
+
+```bash
+curl http://127.0.0.1:8787/v1/jobs/job_123/review
 ```
 
 ## Runtime Boundary

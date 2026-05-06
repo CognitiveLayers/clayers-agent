@@ -37,7 +37,7 @@ Then try:
 /clayers:review
 ```
 
-`/clayers:generate` requests Clayers-owned sync/generation. If the installed Clayers core does not expose autonomous sync yet, the plugin reports that boundary and runs read-only quality checks for any existing spec.
+`/clayers:generate` requests Clayers-owned sync/generation through the Orchestrator. If core Clayers does not expose autonomous sync yet, the Orchestrator generates a deterministic local model from the repository, refreshes hashes through core Clayers, emits docs, runs a query summary, and runs review checks.
 
 Claude Code also supports local marketplace testing:
 
@@ -133,13 +133,15 @@ export CLAYERS_ORCHESTRATOR_URL=http://127.0.0.1:8787
 clayers-orchestrator submit --path /path/to/repo --mode sync --stream
 ```
 
+For local plugin use, starting the service manually is optional. If no `CLAYERS_ORCHESTRATOR_URL` or `CLAYERS_API_URL` is configured and no local service is already reachable, `clayers-orchestrator submit` and `clayers-orchestrator watch` start a temporary local Orchestrator from the release checkout.
+
 Run the local background watcher for a checkout:
 
 ```bash
 clayers-orchestrator watch --path /path/to/repo --mode sync
 ```
 
-The watcher is local-only. It observes filesystem changes, debounces them, submits a Clayers job to the local Orchestrator, streams progress, and refreshes its baseline after each run to avoid loops from generated outputs.
+The watcher is local-only. It observes filesystem changes, debounces them, submits a Clayers sync job to the local Orchestrator, streams progress, and refreshes its baseline after each run to avoid loops from generated outputs.
 
 For Cloudflare deployment, use the Worker and container package:
 

@@ -50,7 +50,7 @@ export default {
 };
 
 function isApiRoute(pathname: string): boolean {
-  return pathname === "/v1/jobs" || /^\/v1\/jobs\/[^/]+(?:\/events)?$/.test(pathname);
+  return pathname === "/v1/jobs" || /^\/v1\/jobs\/[^/]+(?:\/(?:events|docs|query|review))?$/.test(pathname);
 }
 
 function selectRunnerName(_request: Request): string {

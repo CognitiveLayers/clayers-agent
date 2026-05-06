@@ -47,6 +47,7 @@ export interface StepOptions {
   args: string[];
   cwd: string;
   allowNonZero?: boolean;
+  markIssueOnNonZero?: boolean;
 }
 
 export interface StepResult {

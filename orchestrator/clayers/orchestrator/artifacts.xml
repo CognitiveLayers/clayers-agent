@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated artifact mappings. Hashes are refreshed through Clayers core. -->
+<spec:clayers xmlns:spec="urn:clayers:spec"
+       xmlns:art="urn:clayers:artifact"
+       spec:index="index.xml">
+
+  <art:mapping id="map-file-agents-md-a54ff182">
+    <art:spec-ref node="file-agents-md-a54ff182"
+              revision="draft-1"
+              node-hash="sha256:fae428ec08495cb98c6ac4ec03c47c34ebe37f900a197b0caddf9e762a4e8028"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/AGENTS.md">
+      <art:range hash="sha256:9f89d95d8f1ddc1ebb663f8db4386112b350ecfb8cd0dcebfb1d89dd67c4ae41"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-package-json-745e05f7">
+    <art:spec-ref node="file-cloudflare-package-json-745e05f7"
+              revision="draft-1"
+              node-hash="sha256:cf559edd437d91384d97f1a85c8160c90140e47abe3276f47d2fe99d9e7a5d0c"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/package.json">
+      <art:range hash="sha256:0ef975dea58ab487047994a5bac101d8e164b42264789e558c66a56043738f02"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-dockerfile-dd2c0eb6">
+    <art:spec-ref node="file-dockerfile-dd2c0eb6"
+              revision="draft-1"
+              node-hash="sha256:7a235dd551f086939d7b9df0981ad09b68cb29c1899e8e4ee244df68c5db30ce"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/Dockerfile">
+      <art:range hash="sha256:a6eebcc2134f34bc56876e414cab08677436dad8ed549425ef692da43b657461"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-package-json-7ae45ad1">
+    <art:spec-ref node="file-package-json-7ae45ad1"
+              revision="draft-1"
+              node-hash="sha256:b96c6defa5c1a8269795065d6f42e0886cffbc1a095a089948000a4f99928b34"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/package.json">
+      <art:range hash="sha256:5afec5d49b8f3ee8a280fd344f04f7f3cee94f0fa182825c712070b6e4991fc5"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-src-index-ts-97282eeb">
+    <art:spec-ref node="file-cloudflare-src-index-ts-97282eeb"
+              revision="draft-1"
+              node-hash="sha256:30be54aa8809ea684ca8cf41676298ff68f50b77586f2e34a3feb77919ef387c"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/src/index.ts">
+      <art:range hash="sha256:27b656f97ed9fb38087198b0d2771b34d1ea7e2e44f5a3b5e3d5d3066d3eee28"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-client-ts-25d66d74">
+    <art:spec-ref node="file-src-client-ts-25d66d74"
+              revision="draft-1"
+              node-hash="sha256:4a28a9b3da96e7bacca7af36e6a953b230c191a6baae1885dd27880b65aafd20"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/client.ts">
+      <art:range hash="sha256:23db76360f65399078aee1e2f018add5361a7c4d80717e7321b382538fe1da3e"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-job-store-ts-2d3a25cb">
+    <art:spec-ref node="file-src-job-store-ts-2d3a25cb"
+              revision="draft-1"
+              node-hash="sha256:89d4713d4da60136abc81d50d70f58723b237a63aabdd6d06f7457f6cd0b3800"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/job-store.ts">
+      <art:range hash="sha256:62104edcb22d2d49dcc05a0d08dd8adc84ecb021255b1373665d05d1a6476650"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-model-generator-ts-d925604c">
+    <art:spec-ref node="file-src-model-generator-ts-d925604c"
+              revision="draft-1"
+              node-hash="sha256:3e1911574a82a01b1a477713eb1aacb4fd2c696e8431bf38814c8cb94e56fbf1"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/model-generator.ts">
+      <art:range hash="sha256:9af1713f091843e84326da73f9202e8c3691ebe08743f40f77786e74e904556d"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-runner-ts-d64beacb">
+    <art:spec-ref node="file-src-runner-ts-d64beacb"
+              revision="draft-1"
+              node-hash="sha256:be2aec0568a9697766847af28d6e60c32d23497bbb230735dd2640c440f234c1"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/runner.ts">
+      <art:range hash="sha256:65865e52a7eb9340b9cf80c248a948f34ae9fcdb3ca5c654c5fa6d675c6f5453"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-server-ts-8a8ae075">
+    <art:spec-ref node="file-src-server-ts-8a8ae075"
+              revision="draft-1"
+              node-hash="sha256:2cb0004ead95c5a7fb2575de950fb5476f7103feba3553bfb78df60bb2cc00de"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/server.ts">
+      <art:range hash="sha256:89f2b26c14f4d219200ca36ab138fe4c90c32731817e8d757e13b5a89135fbf6"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-types-ts-c54113cf">
+    <art:spec-ref node="file-src-types-ts-c54113cf"
+              revision="draft-1"
+              node-hash="sha256:9301beb91f1e9494e79d42f1c5bfe5292d99152bfa11bb5d5e0b2eee2bd71f6f"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/types.ts">
+      <art:range hash="sha256:2e87e71537fa9173225c930432811bf55afa4a632e4c4c9068cd30d52ce448c3"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-src-watcher-ts-2207093b">
+    <art:spec-ref node="file-src-watcher-ts-2207093b"
+              revision="draft-1"
+              node-hash="sha256:e75e2583f35f046a71b250bfb9f3dcc2685bc397abd9d0a0c65fe72c94d88fe1"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/watcher.ts">
+      <art:range hash="sha256:dae4da7037eeef3f3ca7210ec9f03cbdc5fb58afaf3b972050f61a477147ccc1"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-readme-md-9035d38d">
+    <art:spec-ref node="file-cloudflare-readme-md-9035d38d"
+              revision="draft-1"
+              node-hash="sha256:d2f656a37ea16afce3d28ba9b6482fd80c2a54970b0caa5f21958d43cb5c2393"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/README.md">
+      <art:range hash="sha256:a41e314c4bc5d0b09b6a5db9159415616ab60d28b30ebdc0c049dc94ce2f84df"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-readme-md-b3356305">
+    <art:spec-ref node="file-readme-md-b3356305"
+              revision="draft-1"
+              node-hash="sha256:77fa43ff3e22ba0dc38762ffd469206b6ff73c8744980eb1a472caa397b47ac8"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/README.md">
+      <art:range hash="sha256:9ed272cf6e9e8f7351075ca7bc4b667901f816589117498bc49ffb44abe78a38"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-dockerignore-2f754321">
+    <art:spec-ref node="file-dockerignore-2f754321"
+              revision="draft-1"
+              node-hash="sha256:8375f34f0bf562a807b0198ba6c4e0641c2f11a0517995100ceb258adf845978"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/.dockerignore">
+      <art:range hash="sha256:9df1aaa09106c772048a0f0863b16dd2f217da0e39cb67abe6d57b1fe517f107"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-bin-clayers-orchestrator-27a6cfdc">
+    <art:spec-ref node="file-bin-clayers-orchestrator-27a6cfdc"
+              revision="draft-1"
+              node-hash="sha256:48cd752deb49ff2d529005fdfb6f40d3c2f8efa50ec1e3d199b8081de91bfbeb"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/bin/clayers-orchestrator">
+      <art:range hash="sha256:78c2cc4a62564d84526580520f5fcd21f300cde45d7682c54c130716a5a7e077"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-package-lock-json-0e074670">
+    <art:spec-ref node="file-cloudflare-package-lock-json-0e074670"
+              revision="draft-1"
+              node-hash="sha256:114b48c2b4699e1723114a9c5e50cbe446e7dc8473cde7e991631174d03d9b45"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/package-lock.json">
+      <art:range hash="sha256:dc03cffe4b0ee5b0994288cc16c731ce02668c57090305c3c436ca1c56392f15"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-scripts-check-9b6f79e5">
+    <art:spec-ref node="file-cloudflare-scripts-check-9b6f79e5"
+              revision="draft-1"
+              node-hash="sha256:3fd1ffe2d6623f18ba2ba6d1f8974435da4369703ad8dcf8e7681cdcb3625446"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/scripts/check">
+      <art:range hash="sha256:cb3289f712e8fbd8fb7dc7465da0beec17e28f628f04ed80f4cb3f2c1c88216c"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-tsconfig-json-7e4891fd">
+    <art:spec-ref node="file-cloudflare-tsconfig-json-7e4891fd"
+              revision="draft-1"
+              node-hash="sha256:f44f828c6268629272bf68e0d57656ac3fe8e9462722d4cbc326e47774a1d624"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/tsconfig.json">
+      <art:range hash="sha256:3011d6bda01d0dc8a210eac1701e79fd5ab016fc65f45f37ba4bd6f534a1eb9c"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-cloudflare-wrangler-json-f7e61e5d">
+    <art:spec-ref node="file-cloudflare-wrangler-json-f7e61e5d"
+              revision="draft-1"
+              node-hash="sha256:019acc64be18bf1997ee6258e1a3ba20ec206ef509eaf9980efe76381aaeddd4"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/cloudflare/wrangler.json">
+      <art:range hash="sha256:15555df115b4a34175255668459acb79cbab9a52bdeeb8fbfae0e7213a21e94d"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-package-lock-json-053150b6">
+    <art:spec-ref node="file-package-lock-json-053150b6"
+              revision="draft-1"
+              node-hash="sha256:6f8d51385c71f10406b04156be08421d1e6d635ed0b6d1f7e9cb628a88fb608c"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/package-lock.json">
+      <art:range hash="sha256:5d2cd356b9d19160a405333f1b4beb4d7c898ee3790d16b660cc8c972ee99f44"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-scripts-check-90934217">
+    <art:spec-ref node="file-scripts-check-90934217"
+              revision="draft-1"
+              node-hash="sha256:069699b2b6c25ebece57c9c37bedb09d88b49e5320420c2143bd7be91c60349e"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/scripts/check">
+      <art:range hash="sha256:7fe3d6c46b635317f6306699e50ae7eeea9545515fc7cadb8d1f6dcefb0fd880"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-scripts-clayers-check-095779f4">
+    <art:spec-ref node="file-scripts-clayers-check-095779f4"
+              revision="draft-1"
+              node-hash="sha256:1cda164105247bdb41e9cb56685c74785f7c10adfef3fc117c94715a1d85edee"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/scripts/clayers-check">
+      <art:range hash="sha256:f8440c331e723a53d7e85b3525f5e80a2b603e46fe50b9b169b2fdc30d166173"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-scripts-self-sync-53444097">
+    <art:spec-ref node="file-scripts-self-sync-53444097"
+              revision="draft-1"
+              node-hash="sha256:b0a3480aa5d175bc95a9d9abc5985aef172da019a60ab3dc45d65fe6e9e763f5"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/scripts/self-sync">
+      <art:range hash="sha256:d8f059e07952be859efbc55b9f500a324b5a920a465e82d973928c24b0b73fcf"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-scripts-smoke-0719e516">
+    <art:spec-ref node="file-scripts-smoke-0719e516"
+              revision="draft-1"
+              node-hash="sha256:242cb3e86d4be755b4286541acffcb334797798d39e261f4a8da59b0f3068234"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/scripts/smoke">
+      <art:range hash="sha256:e31af782df672b12b24fac8b220d7c7cc8b362f47aee3fd4f55344bb290a5129"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
+  <art:mapping id="map-file-tsconfig-json-b55cdbef">
+    <art:spec-ref node="file-tsconfig-json-b55cdbef"
+              revision="draft-1"
+              node-hash="sha256:eecd265d69fe9658b40b4c1d7cb9829bb5987d8a4a65f8c9add8ec77976474e4"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/tsconfig.json">
+      <art:range hash="sha256:0c2e049a3ba3c39212b77f3ce5bf7e71683aaa766452880ca91271d52bdcf6b8"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+</spec:clayers>

@@ -4,7 +4,7 @@
 
 Current release target: `v0.1.0`.
 
-This is suitable for an open-source local-first plugin release after local installation smoke tests in Claude Code and Codex.
+This is suitable for an open-source local-first plugin release after local generation, watcher, docs/query/review, and marketplace smoke tests pass.
 
 ## Repository Shape
 
@@ -43,7 +43,7 @@ Expected results:
 
 - JSON manifests are valid.
 - Shell scripts pass `bash -n`.
-- Orchestrator TypeScript, Cloudflare Worker TypeScript, and shell scripts pass syntax checks.
+- Orchestrator TypeScript, Cloudflare Worker TypeScript, shell scripts, sync smoke, docs endpoint, query endpoint, review endpoint, and watcher smoke pass.
 - Codex skill files validate.
 - Claude and Codex bootstrap scripts locate usable core Clayers.
 - Pinned plugin versions match the core Clayers crate version.
@@ -96,6 +96,8 @@ For local client smoke tests, run:
 ```bash
 scripts/smoke-install
 ```
+
+The orchestrator smoke test also verifies that the Claude helper can start a temporary local Orchestrator and complete `repo -> Clayers model -> docs/query/review` without a pre-running service.
 
 ## GitHub Publish
 

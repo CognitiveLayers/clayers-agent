@@ -1,7 +1,10 @@
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
+import { spawnSync } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { JobStore, snapshotJob } from "./job-store.js";
-import { runClayersJob } from "./runner.js";
-import type { JobInput, JobMode, JobStatus } from "./types.js";
+import { resolveClayersBin, runClayersJob } from "./runner.js";
+import type { Job, JobInput, JobMode, JobStatus } from "./types.js";
 
 const store = new JobStore();
 
@@ -46,6 +49,24 @@ export function createServer(): http.Server {
         return;
       }
 
+      const docsMatch = url.pathname.match(/^\/v1\/jobs\/([^/]+)\/docs$/);
+      if (req.method === "GET" && docsMatch?.[1]) {
+        await sendJobDocs(res, docsMatch[1]);
+        return;
+      }
+
+      const queryMatch = url.pathname.match(/^\/v1\/jobs\/([^/]+)\/query$/);
+      if (req.method === "POST" && queryMatch?.[1]) {
+        await runJobQuery(req, res, queryMatch[1]);
+        return;
+      }
+
+      const reviewMatch = url.pathname.match(/^\/v1\/jobs\/([^/]+)\/review$/);
+      if ((req.method === "GET" || req.method === "POST") && reviewMatch?.[1]) {
+        sendJobReview(res, reviewMatch[1]);
+        return;
+      }
+
       const jobMatch = url.pathname.match(/^\/v1\/jobs\/([^/]+)$/);
       if (req.method === "GET" && jobMatch?.[1]) {
         const job = store.get(jobMatch[1]);
@@ -67,6 +88,131 @@ export function createServer(): http.Server {
     } catch (error) {
       sendJson(res, 500, { error: error instanceof Error ? error.message : String(error) });
     }
+  });
+}
+
+async function sendJobDocs(res: ServerResponse, jobId: string): Promise<void> {
+  const job = store.get(jobId);
+  if (!job) {
+    sendJson(res, 404, { error: "job not found" });
+    return;
+  }
+
+  const repoPath = repoPathForJob(job);
+  const docsPath = docsPathForJob(job);
+  if (!repoPath || !docsPath) {
+    sendJson(res, 404, { error: "docs not generated for this job" });
+    return;
+  }
+
+  try {
+    const html = await readFile(path.resolve(repoPath, docsPath), "utf8");
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(html);
+  } catch {
+    sendJson(res, 404, { error: "docs file is not available", path: docsPath });
+  }
+}
+
+async function runJobQuery(req: IncomingMessage, res: ServerResponse, jobId: string): Promise<void> {
+  const job = store.get(jobId);
+  if (!job) {
+    sendJson(res, 404, { error: "job not found" });
+    return;
+  }
+
+  const body = await readJson(req);
+  const query = typeof body.query === "string" ? body.query : body.xpath;
+  if (typeof query !== "string" || query.trim().length === 0) {
+    sendJson(res, 400, { error: "query requires a non-empty query or xpath string" });
+    return;
+  }
+  if (query.trim().startsWith("-")) {
+    sendJson(res, 400, { error: "query must be an XPath expression, not a command option" });
+    return;
+  }
+
+  const repoPath = repoPathForJob(job);
+  const specDir = specDirForJob(job);
+  if (!repoPath || !specDir) {
+    sendJson(res, 404, { error: "spec not available for this job" });
+    return;
+  }
+
+  const count = body.count === true;
+  const relativeSpecDir = path.relative(repoPath, specDir) || specDir;
+  const clayersBin = await resolveClayersBin(store, job);
+  const args = ["query", ...(count ? ["--count"] : []), query, relativeSpecDir];
+  const result = spawnSync(clayersBin, args, {
+    cwd: repoPath,
+    encoding: "utf8",
+    env: process.env,
+    maxBuffer: 5 * 1024 * 1024
+  });
+
+  store.addEvent(job.id, "clayers.query.api", {
+    query,
+    count,
+    code: result.status
+  });
+
+  sendJson(res, result.status === 0 ? 200 : 422, {
+    code: result.status,
+    signal: result.signal,
+    stdout: result.stdout,
+    stderr: result.stderr
+  });
+}
+
+function sendJobReview(res: ServerResponse, jobId: string): void {
+  const job = store.get(jobId);
+  if (!job) {
+    sendJson(res, 404, { error: "job not found" });
+    return;
+  }
+
+  const reviewSteps = new Set([
+    "clayers.fix-node-hash",
+    "clayers.fix-artifact-hash",
+    "clayers.docs",
+    "clayers.query-summary",
+    "clayers.validate",
+    "clayers.drift",
+    "clayers.coverage",
+    "clayers.connectivity"
+  ]);
+  const outputs = new Map<string, string[]>();
+  const steps: Array<Record<string, unknown>> = [];
+
+  for (const event of job.events) {
+    if (event.type === "step.output" && typeof event.data.name === "string") {
+      const name = event.data.name;
+      if (!reviewSteps.has(name)) continue;
+      const lines = outputs.get(name) ?? [];
+      if (typeof event.data.line === "string") lines.push(event.data.line);
+      outputs.set(name, lines.slice(-20));
+    }
+
+    if (event.type === "step.completed" && typeof event.data.name === "string") {
+      const name = event.data.name;
+      if (!reviewSteps.has(name)) continue;
+      steps.push({
+        name,
+        code: event.data.code,
+        signal: event.data.signal,
+        durationMs: event.data.durationMs,
+        output: outputs.get(name) ?? []
+      });
+    }
+  }
+
+  sendJson(res, 200, {
+    jobId: job.id,
+    status: job.status,
+    issueCount: job.issueCount,
+    specDir: specDirForJob(job),
+    docsPath: docsPathForJob(job),
+    steps
   });
 }
 
@@ -115,6 +261,28 @@ function writeSse(res: ServerResponse, event: unknown & { id?: number; type?: st
 
 function isTerminal(status: JobStatus): boolean {
   return ["completed", "completed_with_issues", "failed"].includes(status);
+}
+
+function repoPathForJob(job: Job): string | null {
+  const event = [...job.events].reverse().find((item) => {
+    return (item.type === "repo.local" || item.type === "repo.cloned")
+      && typeof item.data.path === "string";
+  });
+  return typeof event?.data.path === "string" ? event.data.path : null;
+}
+
+function specDirForJob(job: Job): string | null {
+  const event = [...job.events].reverse().find((item) => {
+    return item.type === "spec.detected" && typeof item.data.specDir === "string";
+  });
+  return typeof event?.data.specDir === "string" ? event.data.specDir : null;
+}
+
+function docsPathForJob(job: Job): string | null {
+  const event = [...job.events].reverse().find((item) => {
+    return item.type === "clayers.docs.generated" && typeof item.data.path === "string";
+  });
+  return typeof event?.data.path === "string" ? event.data.path : null;
 }
 
 function normalizeJobInput(input: Record<string, unknown>): JobInput {

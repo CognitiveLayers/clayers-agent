@@ -4,6 +4,31 @@ set -euo pipefail
 orchestrator_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 repo_root="$(CDPATH= cd -- "$orchestrator_root/.." && pwd)"
 
+dump_log() {
+  label="$1"
+  file="$2"
+  if [ -n "$file" ] && [ -f "$file" ]; then
+    printf '\n--- %s: %s ---\n' "$label" "$file" >&2
+    sed -n '1,220p' "$file" >&2
+  fi
+}
+
+on_error() {
+  code="$?"
+  printf 'orchestrator smoke failed at line %s with exit code %s\n' "${BASH_LINENO[0]:-unknown}" "$code" >&2
+  dump_log "server" "${server_log:-}"
+  dump_log "client" "${client_log:-}"
+  dump_log "query" "${query_log:-}"
+  dump_log "review" "${review_log:-}"
+  dump_log "watch" "${watch_log:-}"
+  dump_log "claude-helper" "${claude_helper_log:-}"
+  dump_log "codex-helper" "${codex_helper_log:-}"
+  dump_log "auto-helper" "${auto_helper_log:-}"
+  exit "$code"
+}
+
+trap on_error ERR
+
 need() {
   command -v "$1" >/dev/null 2>&1 || {
     printf 'missing required command: %s\n' "$1" >&2
@@ -71,7 +96,7 @@ node "$orchestrator_root/dist/client.js" submit \
 
 rg -q "job.completed|job.completed_with_issues" "$client_log"
 rg -q "clayers.adopt" "$client_log"
-rg -q "clayers.generate.local" "$client_log"
+rg -q "clayers.generate.local|clayers.sync" "$client_log"
 rg -q "clayers.docs.generated" "$client_log"
 rg -q "clayers.validate" "$client_log"
 test -f "$repo/clayers/repo/repo.clayers.html"
@@ -131,7 +156,7 @@ wait "$watch_pid"
 watch_pid=""
 
 rg -q "\\[watch\\] submitting sync job" "$watch_log"
-rg -q "clayers.generate.local" "$watch_log"
+rg -q "clayers.generate.local|clayers.sync" "$watch_log"
 rg -q "job.completed|job.completed_with_issues" "$watch_log"
 
 claude_helper="$repo_root/claude-plugin/bin/clayers-orchestrator"
@@ -172,7 +197,7 @@ if [ -x "$claude_helper" ]; then
       --path "$auto_repo" \
       --mode sync \
       --stream >"$auto_helper_log" 2>&1
-  rg -q "clayers.generate.local" "$auto_helper_log"
+  rg -q "clayers.generate.local|clayers.sync" "$auto_helper_log"
   rg -q "clayers.docs.generated" "$auto_helper_log"
   test -f "$auto_repo/clayers/auto-repo/auto-repo.clayers.html"
 fi

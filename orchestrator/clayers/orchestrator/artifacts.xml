@@ -319,11 +319,11 @@
   <art:mapping id="map-file-scripts-smoke-0719e516">
     <art:spec-ref node="file-scripts-smoke-0719e516"
               revision="draft-1"
-              node-hash="sha256:190468bad2d6a7dfd87934bc5291c3042fcfa2acb48ec3d9008ae571903203f3"/>
+              node-hash="sha256:db19c9db8f2067e22253b47aa5c60a3a3a7e7ebba6b9b2ed20627148d187df5a"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/scripts/smoke">
-      <art:range hash="sha256:6845cf02a5e7faaedf1096577ad9af28c86833fe8279f9b9f60c59fc098a2839"/>
+      <art:range hash="sha256:e509f5cdaa71fe3d71b7ed40cdd8d411a7fc69281b69f1daa2a9689b1d5d2599"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>

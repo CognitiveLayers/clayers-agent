@@ -175,7 +175,7 @@
             <pr:td><pr:code>scripts/smoke</pr:code></pr:td>
             <pr:td>artifact</pr:td>
             <pr:td>text</pr:td>
-            <pr:td>205</pr:td>
+            <pr:td>207</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>tsconfig.json</pr:code></pr:td>
@@ -359,7 +359,7 @@
     <pr:title>scripts/smoke</pr:title>
     <pr:shortdesc>artifact file using text.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>scripts/smoke</pr:code>.</pr:p>
-    <pr:p>Size: 5600 bytes. Lines: 205.</pr:p>
+    <pr:p>Size: 5737 bytes. Lines: 207.</pr:p>
   </pr:section>
 
   <pr:section id="file-tsconfig-json-b55cdbef">
@@ -507,6 +507,6 @@
   <llm:node ref="file-scripts-check-90934217">scripts/check is a artifact file using text. It has 17 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-scripts-clayers-check-095779f4">scripts/clayers-check is a artifact file using text. It has 8 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-scripts-self-sync-53444097">scripts/self-sync is a artifact file using text. It has 62 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-scripts-smoke-0719e516">scripts/smoke is a artifact file using text. It has 205 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-scripts-smoke-0719e516">scripts/smoke is a artifact file using text. It has 207 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-tsconfig-json-b55cdbef">tsconfig.json is a configuration file using JSON. It has 18 lines and is tracked by an artifact mapping.</llm:node>
 </spec:clayers>

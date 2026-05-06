@@ -17,6 +17,7 @@ on_error() {
   code="$?"
   printf 'orchestrator smoke failed at line %s with exit code %s\n' "${BASH_LINENO[0]:-unknown}" "$code" >&2
   dump_log "server" "${server_log:-}"
+  dump_log "clayers-check" "${clayers_check_log:-}"
   dump_log "client" "${client_log:-}"
   dump_log "query" "${query_log:-}"
   dump_log "review" "${review_log:-}"
@@ -47,7 +48,8 @@ if [ ! -x node_modules/.bin/tsc ]; then
   npm_config_cache="${npm_config_cache:-/tmp/clayers-npm-cache}" npm ci >/dev/null
 fi
 npm run build >/dev/null
-scripts/clayers-check >/dev/null
+clayers_check_log="$(mktemp /tmp/clayers-orchestrator-check.XXXXXX)"
+scripts/clayers-check >"$clayers_check_log" 2>&1
 
 tmp="$(mktemp -d /tmp/clayers-orchestrator-smoke.XXXXXX)"
 repo="$tmp/repo"

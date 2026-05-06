@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { JobStore, snapshotJob } from "./job-store.js";
+import { runLocalQuery } from "./local-query.js";
 import { resolveClayersBin, runClayersJob } from "./runner.js";
 import type { Job, JobInput, JobMode, JobStatus } from "./types.js";
 
@@ -156,11 +157,52 @@ async function runJobQuery(req: IncomingMessage, res: ServerResponse, jobId: str
     code: result.status
   });
 
-  sendJson(res, result.status === 0 ? 200 : 422, {
+  if (result.status === 0) {
+    sendJson(res, 200, {
+      code: result.status,
+      signal: result.signal,
+      stdout: result.stdout,
+      stderr: result.stderr,
+      engine: "clayers-core"
+    });
+    return;
+  }
+
+  try {
+    const fallback = await runLocalQuery(specDir, query, { count });
+    store.addEvent(job.id, "clayers.query.api.fallback", {
+      query,
+      count,
+      coreCode: result.status,
+      fallbackCount: fallback.count
+    });
+    sendJson(res, 200, {
+      code: 0,
+      signal: null,
+      stdout: fallback.stdout,
+      stderr: fallback.stderr,
+      engine: "local-fallback",
+      core: {
+        code: result.status,
+        signal: result.signal,
+        stderr: result.stderr
+      }
+    });
+    return;
+  } catch (error) {
+    store.addEvent(job.id, "clayers.query.api.fallback_failed", {
+      query,
+      count,
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+
+  sendJson(res, 422, {
     code: result.status,
     signal: result.signal,
     stdout: result.stdout,
-    stderr: result.stderr
+    stderr: result.stderr,
+    engine: "clayers-core"
   });
 }
 

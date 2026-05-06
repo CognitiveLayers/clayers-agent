@@ -95,6 +95,12 @@ interface RepoFile {
   nodeId: string;
 }
 
+interface GitInfo {
+  revision: string;
+  branch: string;
+  remote: string;
+}
+
 /**
  * Creates or refreshes a deterministic Clayers model for a repository.
  *
@@ -117,7 +123,7 @@ export async function generateRepositoryModel(repoPath: string): Promise<Generat
 
   const indexXml = renderIndex(projectName);
   const revisionXml = renderRevision(projectName, now, hashText(indexXml));
-  const overviewXml = renderOverview(projectName, files, filesOmitted, gitInfo.revision, gitInfo.branch);
+  const overviewXml = renderOverview(projectName, files, filesOmitted, gitInfo);
   const artifactsXml = renderArtifacts(projectName, files, gitInfo.revision, artifactPathBase);
 
   const writes = new Map<string, string>([
@@ -347,8 +353,7 @@ function renderOverview(
   projectName: string,
   files: RepoFile[],
   filesOmitted: number,
-  repoRevision: string,
-  branch: string
+  gitInfo: GitInfo
 ): string {
   const inventoryRows = files.length > 0
     ? files.map((file) => `          <pr:tr>
@@ -378,7 +383,7 @@ function renderOverview(
   ].join("\n\n");
 
   const llmNodes = [
-    `  <llm:node ref="repo-overview">Generated overview for ${xml(projectName)} at revision ${xml(repoRevision)} on branch ${xml(branch)}.</llm:node>`,
+    `  <llm:node ref="repo-overview">Generated overview for ${xml(projectName)} at revision ${xml(gitInfo.revision)} on branch ${xml(gitInfo.branch)}.</llm:node>`,
     `  <llm:node ref="repo-file-inventory">Generated inventory of ${files.length} repository files${filesOmitted > 0 ? ` with ${filesOmitted} omitted by size or count limits` : ""}.</llm:node>`,
     ...files.map((file) => `  <llm:node ref="${xml(file.nodeId)}">${xml(file.path)} is a ${xml(file.category)} file using ${xml(file.language)}. It has ${file.lines} line${file.lines === 1 ? "" : "s"} and is tracked by an artifact mapping.</llm:node>`)
   ].join("\n");
@@ -388,14 +393,19 @@ function renderOverview(
 <spec:clayers xmlns:spec="urn:clayers:spec"
        xmlns:pr="urn:clayers:prose"
        xmlns:org="urn:clayers:organization"
+       xmlns:vcs="urn:clayers:vcs"
        xmlns:llm="urn:clayers:llm"
        spec:index="index.xml">
+
+  <vcs:git id="repo-${xml(projectName)}"
+           remote="${xml(gitInfo.remote)}"
+           default-branch="${xml(gitInfo.branch)}"/>
 
   <pr:section id="repo-overview">
     <pr:title>${xml(projectName)} Repository Model</pr:title>
     <pr:shortdesc>Generated Clayers model for the local repository.</pr:shortdesc>
     <pr:p>This model was generated from repository files for project <pr:code>${xml(projectName)}</pr:code>.</pr:p>
-    <pr:p>Repository revision: <pr:code>${xml(repoRevision)}</pr:code>. Branch: <pr:code>${xml(branch)}</pr:code>.</pr:p>
+    <pr:p>Repository revision: <pr:code>${xml(gitInfo.revision)}</pr:code>. Branch: <pr:code>${xml(gitInfo.branch)}</pr:code>.</pr:p>
     <pr:p>The generator modeled ${files.length} file${files.length === 1 ? "" : "s"}${filesOmitted > 0 ? ` and omitted ${filesOmitted} file${filesOmitted === 1 ? "" : "s"} by size or count limits` : ""}.</pr:p>
   </pr:section>
 
@@ -578,16 +588,25 @@ function gitOutput(cwd: string, args: string[]): string | null {
   return value.length > 0 ? value : null;
 }
 
-function gitRepositoryInfo(repoPath: string): { revision: string; branch: string } {
+function gitRepositoryInfo(repoPath: string): GitInfo {
   const topLevel = gitOutput(repoPath, ["rev-parse", "--show-toplevel"]);
   if (!topLevel || path.resolve(topLevel) !== path.resolve(repoPath)) {
-    return { revision: "WORKTREE", branch: "local" };
+    return {
+      revision: "WORKTREE",
+      branch: "local",
+      remote: localRepositoryUri(repoPath)
+    };
   }
 
   return {
     revision: gitOutput(repoPath, ["rev-parse", "--short", "HEAD"]) ?? "WORKTREE",
-    branch: gitOutput(repoPath, ["branch", "--show-current"]) ?? "local"
+    branch: gitOutput(repoPath, ["branch", "--show-current"]) ?? "local",
+    remote: gitOutput(repoPath, ["remote", "get-url", "origin"]) ?? localRepositoryUri(repoPath)
   };
+}
+
+function localRepositoryUri(repoPath: string): string {
+  return `file://local/${sanitizeProjectName(path.basename(repoPath))}`;
 }
 
 function artifactPathBaseFor(repoPath: string): string {

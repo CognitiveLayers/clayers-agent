@@ -46,11 +46,11 @@
   <art:mapping id="map-file-package-json-7ae45ad1">
     <art:spec-ref node="file-package-json-7ae45ad1"
               revision="draft-1"
-              node-hash="sha256:b96c6defa5c1a8269795065d6f42e0886cffbc1a095a089948000a4f99928b34"/>
+              node-hash="sha256:74a0d71affa16a09c3e8e6775d97245458ad56d335126788cee3e72637ba9389"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/package.json">
-      <art:range hash="sha256:5afec5d49b8f3ee8a280fd344f04f7f3cee94f0fa182825c712070b6e4991fc5"/>
+      <art:range hash="sha256:aca411c81545722478b6ec0fcc29e7282c73abefd197d6e6c81130a30391e39e"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>
@@ -95,14 +95,27 @@
     <art:note>Generated file-level mapping.</art:note>
   </art:mapping>
 
+  <art:mapping id="map-file-src-local-query-ts-b9ff1430">
+    <art:spec-ref node="file-src-local-query-ts-b9ff1430"
+              revision="draft-1"
+              node-hash="sha256:d0dfa5bf9d9bcd451d913a0de16cd8cb157243c8c8789dac1de94727cd4ac6cd"/>
+    <art:artifact repo="repo-orchestrator"
+              repo-revision="WORKTREE"
+              path="orchestrator/src/local-query.ts">
+      <art:range hash="sha256:64bbfb6d1493c44619e357c0249c223416e80c4099c7a9c8eb3b88c7b1d24fcc"/>
+    </art:artifact>
+    <art:coverage>full</art:coverage>
+    <art:note>Generated file-level mapping.</art:note>
+  </art:mapping>
+
   <art:mapping id="map-file-src-model-generator-ts-d925604c">
     <art:spec-ref node="file-src-model-generator-ts-d925604c"
               revision="draft-1"
-              node-hash="sha256:3e1911574a82a01b1a477713eb1aacb4fd2c696e8431bf38814c8cb94e56fbf1"/>
+              node-hash="sha256:0c0dc22d39730bb25ef28868b623dbc6d6172cc0f5b1ca74736c1eaf8228e679"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/model-generator.ts">
-      <art:range hash="sha256:9af1713f091843e84326da73f9202e8c3691ebe08743f40f77786e74e904556d"/>
+      <art:range hash="sha256:5ba89018ac7b529b4d62c5e0ec319cac64d4f51571dcd2bdb6242e76f80dd9e3"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>
@@ -111,11 +124,11 @@
   <art:mapping id="map-file-src-runner-ts-d64beacb">
     <art:spec-ref node="file-src-runner-ts-d64beacb"
               revision="draft-1"
-              node-hash="sha256:be2aec0568a9697766847af28d6e60c32d23497bbb230735dd2640c440f234c1"/>
+              node-hash="sha256:463ccd69d9fadf4c062e57a50b9f169dadee50ff90e5c272cd4a70bfbdb78dfd"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/runner.ts">
-      <art:range hash="sha256:65865e52a7eb9340b9cf80c248a948f34ae9fcdb3ca5c654c5fa6d675c6f5453"/>
+      <art:range hash="sha256:c0f0c896f36d5859f752e118b56d35f75d3c6c0414e43ef861ec730e9239a77e"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>
@@ -124,11 +137,11 @@
   <art:mapping id="map-file-src-server-ts-8a8ae075">
     <art:spec-ref node="file-src-server-ts-8a8ae075"
               revision="draft-1"
-              node-hash="sha256:2cb0004ead95c5a7fb2575de950fb5476f7103feba3553bfb78df60bb2cc00de"/>
+              node-hash="sha256:f7d99fe28929f3a2152c95dea43d31d6fbeb1c22654e0b43541491c53a6fb0cb"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/src/server.ts">
-      <art:range hash="sha256:89f2b26c14f4d219200ca36ab138fe4c90c32731817e8d757e13b5a89135fbf6"/>
+      <art:range hash="sha256:342f2419c9e20716ec8fefb07342eb05889c3ea50e2de45f65a934c3aed8684d"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>
@@ -267,11 +280,11 @@
   <art:mapping id="map-file-package-lock-json-053150b6">
     <art:spec-ref node="file-package-lock-json-053150b6"
               revision="draft-1"
-              node-hash="sha256:6f8d51385c71f10406b04156be08421d1e6d635ed0b6d1f7e9cb628a88fb608c"/>
+              node-hash="sha256:997eba775a6be694234eea24f33d9597f8309c154a32a56a2bf486401f8580e8"/>
     <art:artifact repo="repo-orchestrator"
               repo-revision="WORKTREE"
               path="orchestrator/package-lock.json">
-      <art:range hash="sha256:5d2cd356b9d19160a405333f1b4beb4d7c898ee3790d16b660cc8c972ee99f44"/>
+      <art:range hash="sha256:5dd3d6289f169f072c1bb9b0847b7ae1aa79076ffec05e4a4a1a0e6fb9c630c4"/>
     </art:artifact>
     <art:coverage>full</art:coverage>
     <art:note>Generated file-level mapping.</art:note>

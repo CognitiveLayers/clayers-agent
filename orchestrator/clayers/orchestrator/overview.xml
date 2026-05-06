@@ -3,15 +3,20 @@
 <spec:clayers xmlns:spec="urn:clayers:spec"
        xmlns:pr="urn:clayers:prose"
        xmlns:org="urn:clayers:organization"
+       xmlns:vcs="urn:clayers:vcs"
        xmlns:llm="urn:clayers:llm"
        spec:index="index.xml">
+
+  <vcs:git id="repo-orchestrator"
+           remote="file://local/orchestrator"
+           default-branch="local"/>
 
   <pr:section id="repo-overview">
     <pr:title>orchestrator Repository Model</pr:title>
     <pr:shortdesc>Generated Clayers model for the local repository.</pr:shortdesc>
     <pr:p>This model was generated from repository files for project <pr:code>orchestrator</pr:code>.</pr:p>
     <pr:p>Repository revision: <pr:code>WORKTREE</pr:code>. Branch: <pr:code>local</pr:code>.</pr:p>
-    <pr:p>The generator modeled 26 files.</pr:p>
+    <pr:p>The generator modeled 27 files.</pr:p>
   </pr:section>
 
   <pr:section id="repo-file-inventory">
@@ -49,7 +54,7 @@
             <pr:td><pr:code>package.json</pr:code></pr:td>
             <pr:td>configuration</pr:td>
             <pr:td>JSON</pr:td>
-            <pr:td>25</pr:td>
+            <pr:td>29</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>cloudflare/src/index.ts</pr:code></pr:td>
@@ -70,22 +75,28 @@
             <pr:td>117</pr:td>
           </pr:tr>
           <pr:tr>
+            <pr:td><pr:code>src/local-query.ts</pr:code></pr:td>
+            <pr:td>source</pr:td>
+            <pr:td>TypeScript</pr:td>
+            <pr:td>160</pr:td>
+          </pr:tr>
+          <pr:tr>
             <pr:td><pr:code>src/model-generator.ts</pr:code></pr:td>
             <pr:td>source</pr:td>
             <pr:td>TypeScript</pr:td>
-            <pr:td>635</pr:td>
+            <pr:td>654</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>src/runner.ts</pr:code></pr:td>
             <pr:td>source</pr:td>
             <pr:td>TypeScript</pr:td>
-            <pr:td>372</pr:td>
+            <pr:td>389</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>src/server.ts</pr:code></pr:td>
             <pr:td>source</pr:td>
             <pr:td>TypeScript</pr:td>
-            <pr:td>362</pr:td>
+            <pr:td>404</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>src/types.ts</pr:code></pr:td>
@@ -151,7 +162,7 @@
             <pr:td><pr:code>package-lock.json</pr:code></pr:td>
             <pr:td>configuration</pr:td>
             <pr:td>JSON</pr:td>
-            <pr:td>53</pr:td>
+            <pr:td>75</pr:td>
           </pr:tr>
           <pr:tr>
             <pr:td><pr:code>scripts/check</pr:code></pr:td>
@@ -212,7 +223,7 @@
     <pr:title>package.json</pr:title>
     <pr:shortdesc>configuration file using JSON.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>package.json</pr:code>.</pr:p>
-    <pr:p>Size: 656 bytes. Lines: 25.</pr:p>
+    <pr:p>Size: 737 bytes. Lines: 29.</pr:p>
   </pr:section>
 
   <pr:section id="file-cloudflare-src-index-ts-97282eeb">
@@ -236,25 +247,32 @@
     <pr:p>Size: 3199 bytes. Lines: 117.</pr:p>
   </pr:section>
 
+  <pr:section id="file-src-local-query-ts-b9ff1430">
+    <pr:title>src/local-query.ts</pr:title>
+    <pr:shortdesc>source file using TypeScript.</pr:shortdesc>
+    <pr:p>Generated from repository artifact <pr:code>src/local-query.ts</pr:code>.</pr:p>
+    <pr:p>Size: 5330 bytes. Lines: 160.</pr:p>
+  </pr:section>
+
   <pr:section id="file-src-model-generator-ts-d925604c">
     <pr:title>src/model-generator.ts</pr:title>
     <pr:shortdesc>source file using TypeScript.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>src/model-generator.ts</pr:code>.</pr:p>
-    <pr:p>Size: 19821 bytes. Lines: 635.</pr:p>
+    <pr:p>Size: 20311 bytes. Lines: 654.</pr:p>
   </pr:section>
 
   <pr:section id="file-src-runner-ts-d64beacb">
     <pr:title>src/runner.ts</pr:title>
     <pr:shortdesc>source file using TypeScript.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>src/runner.ts</pr:code>.</pr:p>
-    <pr:p>Size: 11736 bytes. Lines: 372.</pr:p>
+    <pr:p>Size: 12311 bytes. Lines: 389.</pr:p>
   </pr:section>
 
   <pr:section id="file-src-server-ts-8a8ae075">
     <pr:title>src/server.ts</pr:title>
     <pr:shortdesc>source file using TypeScript.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>src/server.ts</pr:code>.</pr:p>
-    <pr:p>Size: 11530 bytes. Lines: 362.</pr:p>
+    <pr:p>Size: 12520 bytes. Lines: 404.</pr:p>
   </pr:section>
 
   <pr:section id="file-src-types-ts-c54113cf">
@@ -331,7 +349,7 @@
     <pr:title>package-lock.json</pr:title>
     <pr:shortdesc>configuration file using JSON.</pr:shortdesc>
     <pr:p>Generated from repository artifact <pr:code>package-lock.json</pr:code>.</pr:p>
-    <pr:p>Size: 1618 bytes. Lines: 53.</pr:p>
+    <pr:p>Size: 2393 bytes. Lines: 75.</pr:p>
   </pr:section>
 
   <pr:section id="file-scripts-check-90934217">
@@ -403,6 +421,10 @@
 
   <org:reference ref="file-src-job-store-ts-2d3a25cb">
     <org:purpose>Generated reference node for src/job-store.ts.</org:purpose>
+  </org:reference>
+
+  <org:reference ref="file-src-local-query-ts-b9ff1430">
+    <org:purpose>Generated reference node for src/local-query.ts.</org:purpose>
   </org:reference>
 
   <org:reference ref="file-src-model-generator-ts-d925604c">
@@ -482,17 +504,18 @@
   </org:reference>
 
   <llm:node ref="repo-overview">Generated overview for orchestrator at revision WORKTREE on branch local.</llm:node>
-  <llm:node ref="repo-file-inventory">Generated inventory of 26 repository files.</llm:node>
+  <llm:node ref="repo-file-inventory">Generated inventory of 27 repository files.</llm:node>
   <llm:node ref="file-agents-md-a54ff182">AGENTS.md is a documentation file using Markdown. It has 26 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-cloudflare-package-json-745e05f7">cloudflare/package.json is a configuration file using JSON. It has 20 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-dockerfile-dd2c0eb6">Dockerfile is a artifact file using Dockerfile. It has 33 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-package-json-7ae45ad1">package.json is a configuration file using JSON. It has 25 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-package-json-7ae45ad1">package.json is a configuration file using JSON. It has 29 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-cloudflare-src-index-ts-97282eeb">cloudflare/src/index.ts is a source file using TypeScript. It has 86 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-client-ts-25d66d74">src/client.ts is a source file using TypeScript. It has 338 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-job-store-ts-2d3a25cb">src/job-store.ts is a source file using TypeScript. It has 117 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-src-model-generator-ts-d925604c">src/model-generator.ts is a source file using TypeScript. It has 635 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-src-runner-ts-d64beacb">src/runner.ts is a source file using TypeScript. It has 372 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-src-server-ts-8a8ae075">src/server.ts is a source file using TypeScript. It has 362 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-src-local-query-ts-b9ff1430">src/local-query.ts is a source file using TypeScript. It has 160 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-src-model-generator-ts-d925604c">src/model-generator.ts is a source file using TypeScript. It has 654 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-src-runner-ts-d64beacb">src/runner.ts is a source file using TypeScript. It has 389 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-src-server-ts-8a8ae075">src/server.ts is a source file using TypeScript. It has 404 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-types-ts-c54113cf">src/types.ts is a source file using TypeScript. It has 56 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-src-watcher-ts-2207093b">src/watcher.ts is a source file using TypeScript. It has 229 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-cloudflare-readme-md-9035d38d">cloudflare/README.md is a documentation file using Markdown. It has 43 lines and is tracked by an artifact mapping.</llm:node>
@@ -503,7 +526,7 @@
   <llm:node ref="file-cloudflare-scripts-check-9b6f79e5">cloudflare/scripts/check is a artifact file using text. It has 15 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-cloudflare-tsconfig-json-7e4891fd">cloudflare/tsconfig.json is a configuration file using JSON. It has 14 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-cloudflare-wrangler-json-f7e61e5d">cloudflare/wrangler.json is a configuration file using JSON. It has 36 lines and is tracked by an artifact mapping.</llm:node>
-  <llm:node ref="file-package-lock-json-053150b6">package-lock.json is a configuration file using JSON. It has 53 lines and is tracked by an artifact mapping.</llm:node>
+  <llm:node ref="file-package-lock-json-053150b6">package-lock.json is a configuration file using JSON. It has 75 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-scripts-check-90934217">scripts/check is a artifact file using text. It has 17 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-scripts-clayers-check-095779f4">scripts/clayers-check is a artifact file using text. It has 8 lines and is tracked by an artifact mapping.</llm:node>
   <llm:node ref="file-scripts-self-sync-53444097">scripts/self-sync is a artifact file using text. It has 62 lines and is tracked by an artifact mapping.</llm:node>

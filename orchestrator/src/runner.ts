@@ -8,6 +8,7 @@ import type { Readable } from "node:stream";
 import type { JobStore } from "./job-store.js";
 import type { Job, StepOptions, StepResult } from "./types.js";
 import { generateRepositoryModel, writeFallbackDocs } from "./model-generator.js";
+import { runLocalQuery } from "./local-query.js";
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(moduleDir, "../..");
@@ -138,13 +139,29 @@ async function refreshGeneratedArtifacts(
     path: docsPath
   });
 
-  await runStep(store, job, {
+  const queryResult = await runStep(store, job, {
     name: "clayers.query-summary",
     command: clayersBin,
     args: ["query", "--count", "//*[@id]", relativeSpecDir],
     cwd: repoPath,
-    allowNonZero: true
+    allowNonZero: true,
+    markIssueOnNonZero: false
   });
+
+  if (queryResult.code !== 0) {
+    try {
+      const fallback = await runLocalQuery(specDir, "//*[@id]", { count: true });
+      store.addEvent(job.id, "clayers.query-summary.fallback", {
+        query: "//*[@id]",
+        count: fallback.count
+      });
+    } catch (error) {
+      store.addEvent(job.id, "clayers.query-summary.fallback_failed", {
+        message: error instanceof Error ? error.message : String(error)
+      });
+      store.markIssue(job.id);
+    }
+  }
 
 }
 
